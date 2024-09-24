@@ -931,11 +931,6 @@ static int setAllSpecificColorLedOn(enum ate_led_color color)
 	case MODEL_RTAC59CD6R:
 	case MODEL_RTAC59CD6N:
 	case MODEL_PLAX56XP4:
-	case MODEL_RT360V6:
-	case MODEL_RTAX18:
-	case MODEL_RTAX5:
-	case MODEL_RTW212X:
-	case MODEL_RTMANGO:
 		{
 			static enum led_id blue_led[] = {
 				LED_BLUE,

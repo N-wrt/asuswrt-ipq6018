@@ -1681,11 +1681,6 @@ misc_defaults(int restore_defaults)
 
 		/* IPQ60XX models */
 		case MODEL_PLAX56XP4:
-		case MODEL_RT360V6:
-		case MODEL_RTAX18:
-		case MODEL_RTAX5:
-		case MODEL_RTW212X:
-		case MODEL_RTMANGO:
 			nvram_set("reboot_time", "110");		// temporarily
 			break;
 

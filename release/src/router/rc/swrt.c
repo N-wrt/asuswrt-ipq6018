@@ -505,8 +505,8 @@ void swrt_init_post(){
 	start_k3screen();
 #endif
 #if defined(SWRT_VER_MAJOR_B)
-	del_rc_support("amasRouter");
-	del_rc_support("amas");
+	//del_rc_support("amasRouter");
+	//del_rc_support("amas");
 #endif
 	//gen_swrtid();
 #if defined(R8000P) || defined(RTAX89U)
