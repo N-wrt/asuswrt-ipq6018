@@ -21,7 +21,7 @@
 #define CONFIG_METATOOLDIR	"build_ipq"
 
 #define CONFIG_UBI_SUPPORT
-// #define CONFIG_DUAL_TRX
+#define CONFIG_DUAL_TRX
 #define CONFIG_BLVER		"1004"
 #define CONFIG_DUAL_BAND
 #define CONFIG_HAVE_WAN_RED_LED
