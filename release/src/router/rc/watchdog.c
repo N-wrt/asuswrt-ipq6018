@@ -7614,7 +7614,7 @@ static void auto_firmware_check()
 			|| (update_enable == 1 && nvram_get_int("webs_state_flag") == 1)
 #endif
 #else
-			if(false
+			if(0
 #endif
 			)
 			{
@@ -8058,10 +8058,10 @@ static void bt_turn_off_service()
 	char *tmp;
 
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif
@@ -9174,10 +9174,10 @@ static int bt_reset_once = 0;
 static void bluetooth_check()
 {
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif

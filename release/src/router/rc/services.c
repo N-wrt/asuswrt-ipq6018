@@ -7180,10 +7180,10 @@ void start_dbus_daemon(void)
 	char *dbusd_argv[] = { "dbus-daemon", "--system", NULL };
 
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif
@@ -7211,10 +7211,10 @@ void start_dbus_daemon(void)
 void stop_dbus_daemon(void)
 {
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif
@@ -7515,10 +7515,10 @@ void ble_rename_ssid(void)
 #endif
 
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif
@@ -7560,10 +7560,10 @@ void start_bluetooth_service(void)
 	if(dbg) ble_argv[4] = "-d";
 
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif
@@ -7677,10 +7677,10 @@ reset_again:
 void stop_bluetooth_service(void)
 {
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif

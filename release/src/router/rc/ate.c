@@ -3747,7 +3747,7 @@ int ate_dev_status(void)
 		int retry;
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
 		if(nvram_match("HwId", "A") || nvram_match("HwId", "C")){
-			have_bt_device = 1;
+			have_bt_device = 0;
 		}else{
 			have_bt_device = 0;
 		}

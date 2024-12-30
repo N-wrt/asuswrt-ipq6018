@@ -5959,6 +5959,7 @@ int init_nvram(void)
 		nvram_set_int("led_green_gpio", 32);
 		nvram_set_int("led_red_gpio", 33);
 	    }
+		nvram_set_int("btn_rst_gpio_1", 19|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_white_gpio", 22);
 
 		/* enable bled */
@@ -16818,10 +16819,10 @@ void BT_chip_reset(int stage)
 #endif
 
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
-	if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
+	//if(nvram_match("HwId", "B") || nvram_match("HwId", "D")){
 		/* Slave, no bluetooth */
 		return;
-	}
+	//}
 #elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
 		return;
 #endif

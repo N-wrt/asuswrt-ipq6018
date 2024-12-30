@@ -598,4 +598,5 @@ RTCONFIG_LLDPD_0_9_8=y
 # RTCONFIG_COMFW is not set
 # RTCONFIG_TR143_110 is not set
 # RTCONFIG_SOFTCENTER is not set
+# RTCONFIG_SMARTDNS is not set
 # RTCONFIG_SWRT is not set

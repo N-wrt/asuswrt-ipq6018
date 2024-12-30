@@ -101,7 +101,7 @@ static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
 };
 #elif defined(PLAX56_XP4)
 static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
-	3, 4, 2/*PLC*/, -1, 5,
+	1, 2, 3, 4, 5,
 };
 #else
 #error FIXME
@@ -125,7 +125,7 @@ static const char *vport_to_iface[MAX_WANLAN_PORT] = {
 };
 #elif defined(PLAX56_XP4)
 static const char *vport_to_iface[MAX_WANLAN_PORT] = {
-	"eth2", "eth3", "eth1"/*PLC*/, NULL,	/* LAN1~4 */
+	"eth0", "eth1", "eth2", "eth3",		/* LAN1~4 */
 	"eth4" 					/* WAN1 */
 };
 #else
