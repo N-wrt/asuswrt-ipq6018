@@ -195,7 +195,7 @@ static const struct led_btn_table_s {
 	{ "led_blue_gpio",	&led_gpio_table[LED_BLUE] },
 	{ "led_green_gpio",	&led_gpio_table[LED_GREEN] },
 	{ "led_red_gpio",	&led_gpio_table[LED_RED] },
-#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4)
 	{ "led_white_gpio",	&led_gpio_table[LED_WHITE] },
 #endif
 #endif
@@ -443,7 +443,7 @@ int init_gpio(void)
 		, "led_5g_green_gpio", "led_5g_orange_gpio", "led_5g_red_gpio"
 #elif defined(RTCONFIG_FIXED_BRIGHTNESS_RGBLED)
 		, "led_blue_gpio", "led_green_gpio", "led_red_gpio"
-#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4)
 		, "led_white_gpio"
 #endif
 #endif
@@ -584,7 +584,7 @@ int init_gpio(void)
 	if((gpio_pin = (use_gpio = nvram_get_int("led_pwr_red_gpio")) & 0xff) != 0xff)
 #elif defined(MAPAC1750)
 	if((gpio_pin = (use_gpio = nvram_get_int("led_blue_gpio")) & 0xff) != 0xff)
-#elif defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#elif defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4)
 	if((gpio_pin = (use_gpio = nvram_get_int("led_green_gpio")) & 0xff) != 0xff)
 #else
 	if((gpio_pin = (use_gpio = nvram_get_int("led_pwr_gpio")) & 0xff) != 0xff)

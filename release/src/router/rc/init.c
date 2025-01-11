@@ -3337,7 +3337,7 @@ int init_nvram(void)
 	char wancaps[16];
 #endif
 
-#if defined(RTCONFIG_WANPORT2) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) ||defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
+#if defined(RTCONFIG_WANPORT2) || defined(PLAX56_XP4)
 	char *wan0, *wan1, *lan_1, *lan_2, lan_ifs[IFNAMSIZ * 4];
 #endif
 #ifdef RTCONFIG_GMAC3
@@ -16810,7 +16810,7 @@ void BT_chip_reset(int stage)
 	bt_reset = 34;
 #elif defined(RTAX95Q) || defined(XT8PRO) || defined(RTAXE95Q) || defined(ET8PRO) || defined(RTAX56_XD4) || defined(XD4PRO) || defined(RTAX82_XD6)
         bt_reset = 29;
-#elif defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) ||defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
+#elif defined(PLAX56_XP4)
         bt_reset = 79;
 #elif defined(ET12) || defined(XT12)
 	bt_reset = 3;
@@ -16823,8 +16823,6 @@ void BT_chip_reset(int stage)
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 	if (stage == 0) {
 		gpio_dir(bt_reset, GPIO_DIR_OUT);
@@ -17393,7 +17391,7 @@ static void sysinit(void)
 		min_free_kbytes_check = 0;
 	}
 #elif defined(RTCONFIG_QCA)
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
+#if defined(PLAX56_XP4)
 	f_write_string("/proc/sys/net/ipv4/conf/default/arp_ignore", "1", 0, 0);
 	f_write_string("/proc/sys/net/ipv4/conf/all/arp_ignore", "1", 0, 0);
 	f_write_string("/proc/sys/net/ipv4/conf/default/arp_announce", "2", 0, 0);

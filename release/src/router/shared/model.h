@@ -145,12 +145,6 @@ enum {
 	MODEL_MAX
 };
 
-#define MODEL_RT360V6 MODEL_PLAX56XP4
-#define MODEL_RTAX18 MODEL_PLAX56XP4
-#define MODEL_RTAX5 MODEL_PLAX56XP4
-#define MODEL_RTW212X MODEL_PLAX56XP4
-#define MODEL_RTMANGO MODEL_PLAX56XP4
-
 /* NOTE: Do not insert new entries in the middle of this enum,
  * always add them to the end! */
 enum {

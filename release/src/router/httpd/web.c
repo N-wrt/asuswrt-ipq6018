@@ -31210,7 +31210,7 @@ struct ej_handler ej_handlers[] = {
 #ifdef RTCONFIG_FANCTRL
 	{ "get_fanctrl_info", get_fanctrl_info},
 #endif
-#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_LANTIQ) || defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
+#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_FANCTRL) || defined(RTCONFIG_LANTIQ) || defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK)
 	{ "get_cpu_temperature", get_cpu_temperature},
 #endif
 	{ "get_machine_name" , get_machine_name},

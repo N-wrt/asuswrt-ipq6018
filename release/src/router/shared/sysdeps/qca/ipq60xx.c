@@ -47,16 +47,7 @@ enum {
 
 	VLAN_TYPE_MAX
 };
-#if defined(RT360V6)
-enum {
-	LAN1_PORT=0,
-	LAN2_PORT=1,
-	LAN3_PORT=2,
-	LAN4_PORT=4,
-	WAN_PORT=3,
-	MAX_WANLAN_PORT=5
-};
-#else
+
 enum {
 	LAN1_PORT=0,
 	LAN2_PORT,
@@ -65,10 +56,9 @@ enum {
 	WAN_PORT,
 	MAX_WANLAN_PORT
 };
-#endif
 
 static const char *upstream_iptv_ifaces[16] = {
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#if defined(PLAX56_XP4)
 	[WANS_DUALWAN_IF_WAN] = "eth4",
 #else
 #error Define WAN interfaces that can be used as upstream port of IPTV.
@@ -95,7 +85,7 @@ static const int lan_wan_partition[9][NR_WANLAN_PORT] = {
  * 			e.g. LAN1_PORT, LAN2_PORT, etc.
  * array element:	PHY address, negative value means absent PHY.
  */
-#if defined(RT360V6) ||defined(RTAX18)|| defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO) /* normal case  */
+#if 0 /* normal case  */
 static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
 	1, 2, 3, 4, 5,
 };
@@ -118,7 +108,7 @@ static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
  * 			e.g. LAN1_PORT, LAN2_PORT, etc.
  * array element:	Interface name of specific virtual port.
  */
-#if defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO) /* normal case  */
+#if 0 /* normal case  */
 static const char *vport_to_iface[MAX_WANLAN_PORT] = {
 	"eth0", "eth1", "eth2", "eth3",		/* LAN1~4 */
 	"eth4" 					/* WAN1 */
@@ -166,7 +156,7 @@ static unsigned int wans_lan_mask = 0;	/* wan_type = WANS_DUALWAN_IF_LAN. */
  * array value:	Model-specific virtual port number
  */
 static int n56u_to_model_port_mapping[] = {
-#if defined(PLAX56_XP4) // shift LAN3/LAN4 -> LAN1/LAN2
+#if 0 // shift LAN3/LAN4 -> LAN1/LAN2
 	LAN2_PORT,	//0000 0000 0100 LAN2
 	LAN1_PORT,	//0000 0000 1000 LAN1
 #else
@@ -971,7 +961,7 @@ rtkswitch_Port_phyStatus(unsigned int port_mask)
 
 	get_ipq60xx_phy_linkStatus(port_mask, &status);
 
-#if defined(PLAX56_XP4)
+#if 0
 	if (port_mask == 1U << LAN3_PORT) { /*PLC*/
 		if (status) {
 			/* CHECK PLC member ship here!! */
@@ -996,7 +986,7 @@ rtkswitch_Port_phyLinkRate(unsigned int port_mask)
 	unsigned int speed = 0;
 
 	get_ipq60xx_Port_Speed(port_mask, &speed);
-#if defined(PLAX56_XP4)
+#if 0
 	if (port_mask == 1U << LAN3_PORT) { /*PLC*/
 		if (speed == 1000) {
 			/* CHECK PLC speed here!! */
@@ -1193,7 +1183,7 @@ void __post_config_switch(void)
 	_eval(ipq807x_p1_8023az, DBGOUT, 0, NULL);
 #endif
 #endif
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#if defined(PLAX56_XP4)
 	eval("devmem", "0x0009b794", "w", "0x7c7d"); // improve switch voltage (011 to 111) to avoid packet loss
 #endif
 }

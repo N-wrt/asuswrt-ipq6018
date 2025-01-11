@@ -170,10 +170,10 @@ static const struct itimerval zombie_tv = { {0,0}, {307, 0} };
 static const char dmhosts[] = "/etc/hosts.dnsmasq";
 static const char dmresolv[] = "/tmp/resolv.conf";
 #if defined(RTCONFIG_SMARTDNS)
-static const char dmservers[] = "/tmp/resolv.dnsmasq";
+const char dmservers[] = "/tmp/resolv.dnsmasq";
 static const char sdservers[] = "/tmp/resolv.smartdns";
 #else
-static const char dmservers[] = "/tmp/resolv.dnsmasq";
+const char dmservers[] = "/tmp/resolv.dnsmasq";
 #endif
 
 #ifdef RTCONFIG_TOAD
@@ -1574,6 +1574,18 @@ void start_dnsmasq(void)
 	if (*value) {
 		fprintf(fp, "domain=%s\n"
 			    "expand-hosts\n", value);	// expand hostnames in hosts file
+	}
+	if (nvram_get_int("dns_fwd_local") != 1) {
+#if defined(RTCONFIG_SMARTDNS)
+		if(!nvram_match("smartdns_enable", "1")){
+#endif
+		fprintf(fp, "bogus-priv\n"			// don't forward private reverse lookups upstream
+		            "domain-needed\n");			// don't forward plain name queries upstream
+		if (*value)
+			fprintf(fp, "local=/%s/\n", value);	// don't forward local domain queries upstream
+#if defined(RTCONFIG_SMARTDNS)
+		}
+#endif
 	}
 
 	if ((is_routing_enabled() && nvram_get_int("dhcp_enable_x"))
@@ -3869,6 +3881,7 @@ static char *get_ddns_macaddr(void)
 		mac = mac_buf_str;
 	}
 #endif
+
 	return mac;
 }
 #endif	/* RTCONFIG_INADYN */
@@ -5624,8 +5637,13 @@ void start_smartdns(void)
 	fprintf(fp, "conf-file /etc/blacklist-ip.conf\n");
 	fprintf(fp, "conf-file /etc/whitelist-ip.conf\n");
 	fprintf(fp, "conf-file /etc/seconddns.conf\n");
+#if defined(RTCONFIG_IPV6)
 	fprintf(fp, "bind [::]:9053 -group master\n");
-	//fprintf(fp, "bind-tcp [::]:5353\n");
+	fprintf(fp, "bind-tcp [::]:9053 -group master\n");
+#else
+	fprintf(fp, "bind :9053 -group master\n");
+	fprintf(fp, "bind-tcp [::]:9053 -group master\n");
+#endif
 	fprintf(fp, "cache-size 9999\n");
 	if(nvram_match("smartdns_prefetch", "1"))
 		fprintf(fp, "prefetch-domain yes\n");
@@ -5649,9 +5667,9 @@ void start_smartdns(void)
 	//fprintf(fp, "rr-ttl-min 60\n");
 	//fprintf(fp, "rr-ttl-max 86400\n");
 	fprintf(fp, "log-level warn\n");
-	//fprintf(fp, "log-file /var/log/smartdns.log\n");
-	//fprintf(fp, "log-size 128k\n");
-	//fprintf(fp, "log-num 2\n");
+	fprintf(fp, "log-file /var/log/smartdns.log\n");
+	fprintf(fp, "log-size 64k\n");
+	fprintf(fp, "log-num 1\n");
 	if(nvram_get_int("smartdns_num") == 0){
 #if !defined(K3) && !defined(R8000P) && !defined(R7000P) && !defined(XWR3100)
 		if(!strncmp(nvram_safe_get("territory_code"), "CN",2)){
@@ -7184,8 +7202,6 @@ void start_dbus_daemon(void)
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 #if defined(RTAX56_XD4)
 	if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||
@@ -7215,8 +7231,6 @@ void stop_dbus_daemon(void)
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 #if defined(RTAX56_XD4)
 	if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||
@@ -7519,8 +7533,6 @@ void ble_rename_ssid(void)
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 #if defined(RTAX56_XD4)
 	if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||
@@ -7564,8 +7576,6 @@ void start_bluetooth_service(void)
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 #if defined(RTAX56_XD4)
 	if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||
@@ -7681,8 +7691,6 @@ void stop_bluetooth_service(void)
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 #if defined(RTAX56_XD4)
 	if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||

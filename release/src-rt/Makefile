@@ -3757,8 +3757,8 @@ define RouterOptions
 		echo "RTCONFIG_COMFW=y" >>$(1); \
 	fi; \
 	if [ "$(SOFTCENTER)" = "y" ]; then \
-	sed -i "/RTCONFIG_SOFTCENTER/d" $(1); \
-	echo "RTCONFIG_SOFTCENTER=y" >>$(1); \
+		sed -i "/RTCONFIG_SOFTCENTER/d" $(1); \
+		echo "RTCONFIG_SOFTCENTER=y" >>$(1); \
 	fi; \
 	if [ "$(SMARTDNS)" = "y" ]; then \
 		sed -i "/RTCONFIG_SMARTDNS/d" $(1); \

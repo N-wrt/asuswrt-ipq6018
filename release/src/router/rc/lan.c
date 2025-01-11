@@ -2743,7 +2743,7 @@ void hotplug_net(void)
 	if (!(interface = getenv("INTERFACE")) ||
 	    !(action = getenv("ACTION")))
 		return;
-#if defined(PLAX56_XP4)
+#if 0
 	if (!strcmp(interface, "eth0")) // XP4 use eth1-eth4
 		return;
 	else if (nvram_match("HwId", "B") && !strcmp(interface, "eth4")) // Node have no eth4

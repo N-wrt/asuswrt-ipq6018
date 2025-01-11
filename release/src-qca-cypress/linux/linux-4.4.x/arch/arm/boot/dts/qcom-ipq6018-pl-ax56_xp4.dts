@@ -33,9 +33,9 @@
 		 */
 		ethernet0 = "/soc/dp1";
 		ethernet1 = "/soc/dp2";
-                ethernet2 = "/soc/dp3";
-                ethernet3 = "/soc/dp4";
-                ethernet4 = "/soc/dp5";
+		ethernet2 = "/soc/dp3";
+		ethernet3 = "/soc/dp4";
+		ethernet4 = "/soc/dp5";
 	};
 };
 
@@ -182,9 +182,9 @@
 	};
 
 
-		nss@40000000 {
-			qcom,max-frequency = <0x64b54000>;
-		};
+	nss@40000000 {
+		qcom,max-frequency = <0x64b54000>;
+	};
 
 
 

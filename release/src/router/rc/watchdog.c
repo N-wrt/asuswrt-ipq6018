@@ -4003,12 +4003,12 @@ void btn_check(void)
 #endif	/* ! RTCONFIG_WPS_RST_BTN */
 		{
 			int wps_enable = nvram_match("wps_enable", "1");
-#if defined(RTCONFIG_QCA_PLC2)
+//#if defined(RTCONFIG_QCA_PLC2)
 			// nvram_unset("plc_pb_state");
 			// if (1)
 // #else
 			if (wps_enable)
-#endif
+//#endif
 			{
 				TRACE_PT("button WPS pressed\n");
 #ifdef BLUECAVE
@@ -4175,7 +4175,7 @@ void btn_check(void)
 			}
 #endif	/* ! RTCONFIG_WPS_RST_BTN */
 
-#if defined(RTCONFIG_QCA_PLC2)
+//#if defined(RTCONFIG_QCA_PLC2)
 			// char *plc_pb_state = nvram_get("plc_pb_state");
 			// int pb_state;
 			// if (plc_pb_state != NULL)
@@ -4186,7 +4186,7 @@ void btn_check(void)
 			// if (((wps_enable || pb_state == -2 /*OB*/) && is_wps_stopped()) || --wsc_timeout == 0 || IS_PLC_JOIN_STOPPED(pb_state))
 // #else
 			if (is_wps_stopped() || --wsc_timeout == 0)
-#endif
+//#endif
 			{
 				wsc_timeout = 0;
 
@@ -8062,8 +8062,6 @@ static void bt_turn_off_service()
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 #if defined(RTAX56_XD4)
 	if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||
@@ -9178,8 +9176,6 @@ static void bluetooth_check()
 		/* Slave, no bluetooth */
 		return;
 	//}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-		return;
 #endif
 #if defined(RTAX56_XD4)
 	if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||

@@ -282,7 +282,7 @@ var QAM1024_support = false;
 	}
 	else{
 		if(based_modelid == "GT-AXY16000"
-		|| based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4" || based_modelid == "RT-360V6" || based_modelid == "RT-AX18" || based_modelid == "RT-AX5" || based_modelid == "RT-W121X"
+		|| based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4"
 		|| based_modelid == "RT-AC95U" || based_modelid == "RT-AC88N" || based_modelid == "RT-AC88Q" || based_modelid == "RT-AC82U" || based_modelid == "RT-AC58U"
 		|| based_modelid == "MAP-AC1300" || based_modelid == "MAP-AC2200" || based_modelid == "VZW-AC1300" || based_modelid == "MAP-AC1750" || based_modelid == "MAP-AC3000" 
 		|| based_modelid == "RT-AD7200"
@@ -409,7 +409,7 @@ function initial(){
 		|| based_modelid == "RT-AC58U" || based_modelid.substring(0,7) == "RT-AC59" || based_modelid == "RT-AC82U" 
 		|| based_modelid == "MAP-AC1300" || based_modelid == "MAP-AC2200" 
 		|| based_modelid == "VZW-AC1300"
-		|| based_modelid == "RT-AC95U" || based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4" || based_modelid == "RT-360V6" || based_modelid == "RT-AX18" || based_modelid == "RT-AX5" || based_modelid == "RT-W121X"){
+		|| based_modelid == "RT-AC95U" || based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4"){
 			inputCtrl(document.form.wl_txbf, 1);
 			document.getElementById("wl_MU_MIMO_field").style.display = "";
 			document.form.wl_mumimo.disabled = false;
@@ -514,14 +514,14 @@ function initial(){
 		|| based_modelid == "BRT-AC828" || based_modelid == "RT-AD7200" || based_modelid == "RT-AC58U" 
 		|| based_modelid == "RT-AC82U" || based_modelid == "MAP-AC1300" || based_modelid == "MAP-AC2200" 
 		|| based_modelid == "VZW-AC1300" || based_modelid == "RT-AC95U"
-		|| based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4" || based_modelid == "RT-360V6" || based_modelid == "RT-AX18" || based_modelid == "RT-AX5" || based_modelid == "RT-W121X")
+		|| based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4")
 		{
 			$('wl_txbf_desc').innerHTML = "<#WLANConfig11b_x_ExpBeam#>";
 			inputCtrl(document.form.wl_txbf, 1);
 		}
 		if(Qcawifi_support && band5g_11ax_support)
 			document.getElementById('wl_txbf_desc').innerHTML = "<#WLANConfig11b_x_acBeam#>";
-		if(Qcawifi_support && (based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4" || based_modelid == "RT-360V6" || based_modelid == "RT-AX18"  || based_modelid == "RT-AX5" || based_modelid == "RT-W121X") && document.form.wl_nmode_x.value == "0" && document.form.wl0_11ax.value == "1"){
+		if(Qcawifi_support && (based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4" ) && document.form.wl_nmode_x.value == "0" && document.form.wl0_11ax.value == "1"){
 			inputCtrl(document.form.wl_txbf, 1);
 			document.getElementById("wl_MU_MIMO_field").style.display = "";
 			document.form.wl_mumimo.disabled = false;
@@ -659,7 +659,7 @@ function initial(){
 
 	if( based_modelid == "BRT-AC828" || based_modelid == "RT-AC82U" || based_modelid == "RT-AC58U" 
 	|| based_modelid == "MAP-AC1300" || based_modelid == "MAP-AC2200" || based_modelid == "VZW-AC1300" 
-	|| based_modelid == "RT-AC95U" || (based_modelid == "GT-AXY16000" && wl_unit_value != '3') || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4" || based_modelid == "RT-360V6" || based_modelid == "RT-AX18" || based_modelid == "RT-AX5" || based_modelid == "RT-W121X"
+	|| based_modelid == "RT-AC95U" || (based_modelid == "GT-AXY16000" && wl_unit_value != '3') || based_modelid == "RT-AX89U" || based_modelid == "PL-AX56_XP4"
 	|| (based_modelid.substring(0,7) == "RT-AC59" && wl_unit_value == '1'))
 		document.getElementById("wl_implicitxbf_field").style.display = "";
 	else
@@ -996,7 +996,7 @@ function validForm(){
 		}	
 		if(Qcawifi_support){
 			min_bcn=40;
-			if(based_modelid == "BRT-AC828" || based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "RT-AD7200" || based_modelid == "PL-AX56_XP4" || based_modelid == "RT-360V6" || based_modelid == "RT-AX18" || based_modelid == "RT-AX5" || based_modelid == "RT-W121X")
+			if(based_modelid == "BRT-AC828" || based_modelid == "GT-AXY16000" || based_modelid == "RT-AX89U" || based_modelid == "RT-AD7200" || based_modelid == "PL-AX56_XP4")
 				min_bcn=100;
 				
 			if(!validator.range(document.form.wl_bcn, min_bcn, 1000))

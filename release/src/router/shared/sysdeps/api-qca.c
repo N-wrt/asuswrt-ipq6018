@@ -1487,7 +1487,7 @@ char *get_5g_hwaddr(void)
 
 char *get_label_mac()
 {
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO) // Label MAC is lan_hwaddr
+#if defined(PLAX56_XP4) // Label MAC is lan_hwaddr
 	return nvram_safe_get(get_lan_mac_name()); // same as get_lan_hwaddr()
 #else
 	return get_2g_hwaddr();
@@ -2814,7 +2814,7 @@ int get_wifi_temperature(enum wl_band_id band)
 #define BT_BSCP_CONF_PATH "/etc/bt_bscp_conf.psr"
 #define BT_UART_RATE "115200"
 
-#if !defined(PLAX56_XP4) || !defined(RT360V6) || !defined(RTAX18) || !defined(RTAX5) || !defined(RTW212X) ||defined(RTMANGO)
+#if !defined(PLAX56_XP4)
 #define BT_ACTIVE "0001 0001"
 #define BT_STATUS "0004 0001"
 #define BT_WLAN_DENY "0009 0001"
@@ -2930,7 +2930,7 @@ static int generate_bt_bscp_conf()
 	fprintf(fp, "//# PSKEY_BLE_DEFAULT_TX_POWER\n");
 	fprintf(fp, "&22c8 = 0004\n");
 
-#if !defined(PLAX56_XP4) || !defined(RT360V6) || !defined(RTAX18) || !defined(RTAX5) || !defined(RTW212X) ||defined(RTMANGO)
+#if !defined(PLAX56_XP4)
 	fprintf(fp, "## Configure co-existence\n");
 	fprintf(fp, "# PSKEY_COEX_SCHEME(0x2480) set to 5 for Unity 3+; set to 9 for Unity-3e+\n");
 	fprintf(fp, "#PSKEY_COEX_SCHEME(0x2480) Unity-3 (standard 3 wire co-existence)\n");

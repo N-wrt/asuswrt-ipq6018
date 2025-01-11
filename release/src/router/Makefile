@@ -654,8 +654,6 @@ else
 $(error OpenSSL is not defined)
 endif
 
-obj-$(RTCONFIG_SMARTDNS) += smartdns
-
 obj-$(RTCONFIG_LIBASUSLOG) += libasuslog
 obj-$(RTCONFIG_SW_HW_AUTH) += sw-hw-auth
 ifeq ($(RTCONFIG_TUNNEL),y)
