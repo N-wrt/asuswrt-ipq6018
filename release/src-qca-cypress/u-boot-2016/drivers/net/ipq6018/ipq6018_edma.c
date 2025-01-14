@@ -1008,7 +1008,7 @@ static int ipq6018_eth_init(struct eth_device *eth_dev, bd_t *this)
 
 		if (status == 0) {
 #if defined(PLAX56_XP4) || defined(RTAX5) || defined(RTMANGO) || defined(RTAX18) || defined(RT360V6)
-			if (i !=1 ) // skip PLC port
+//			if (i !=1 ) // skip PLC port
 #endif
 			linkup++;
 			if (old_speed[i] == curr_speed[i]) {

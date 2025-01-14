@@ -414,7 +414,6 @@ void led_init(void)
 	int i;
 #if !defined(PLAX56_XP4) && !defined(RTAX5) && !defined(RTMANGO) && !defined(RTAX18) && !defined(RT360V6)
 	int on;
-	int on;
 #endif
 
 	for (i = 0; i < GPIO_IDX_MAX; i++) {
