@@ -509,7 +509,7 @@ void swrt_init_post(){
 	//del_rc_support("amas");
 #endif
 	//gen_swrtid();
-#if defined(R8000P) || defined(RTAX89U)
+#if defined(R8000P) || defined(RTAX89U) || defined(PLAX56_XP4)
     add_rc_support("uu_accel");
 #endif
 #if defined(RAX120)

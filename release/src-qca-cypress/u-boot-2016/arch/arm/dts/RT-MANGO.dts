@@ -48,12 +48,10 @@
 				phy_address = <3>;
 				phy_type = <MALIBU_PHY_TYPE>;
 			};
-/* disable WAN port at boot stage
 			port@4 {
 				phy_address = <4>;
 				phy_type = <MALIBU_PHY_TYPE>;
 			};
-*/
 		};
 	};
 };
