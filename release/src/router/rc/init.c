@@ -5921,28 +5921,28 @@ int init_nvram(void)
 		if (nvram_match("HwId", "A")) {
 #ifdef RTCONFIG_DUALWAN
 			lan_1=NULL;
-			strcpy(lan_ifs,"eth3 eth2 eth1");
+			strcpy(lan_ifs,"eth3 eth2 eth1 eth0");
 			if (sw_mode() == SW_MODE_ROUTER && get_wans_dualwan() & WANSCAP_LAN) {
 				memset(lan_ifs,0, sizeof(lan_ifs));
 				if (nvram_match("wans_lanport", "1")) //lan port1
 				{	
 					lan_1="eth2";
-					strcpy(lan_ifs,"eth3 eth1");
+					strcpy(lan_ifs,"eth3 eth1 eth0");
 				}
 				else if (nvram_match("wans_lanport", "2")) //lan port2
 				{			
 					lan_1="eth3";
-					strcpy(lan_ifs,"eth2 eth1");
+					strcpy(lan_ifs,"eth2 eth1 eth0");
 				}
 				else
 					_dprintf("error setting\n");
 			}
 			set_basic_ifname_vars(wan_ifaces, lan_ifs, wl_ifaces, "usb", NULL, NULL , lan_1, 0);
 #else				
-			set_basic_ifname_vars(wan_ifaces, "eth3 eth2 eth1", wl_ifaces, "usb", NULL, NULL, NULL, 0);
+			set_basic_ifname_vars(wan_ifaces, "eth3 eth2 eth1 eth0", wl_ifaces, "usb", NULL, NULL, NULL, 0);
 #endif			
 		} else {
-			set_basic_ifname_vars(wan_ifaces, "eth3 eth1", wl_ifaces, NULL, NULL, NULL, NULL, 0);
+			set_basic_ifname_vars(wan_ifaces, "eth3 eth1 eth0", wl_ifaces, NULL, NULL, NULL, NULL, 0);
 		}
 	    if (xp4_old)
 		nvram_unset("btn_rst_gpio");
@@ -5951,15 +5951,16 @@ int init_nvram(void)
 	    else
 		nvram_set_int("btn_rst_gpio", 34|GPIO_ACTIVE_LOW);
 		nvram_set_int("btn_wps_gpio", 9|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_blue_gpio", 25);
+		nvram_set_int("led_blue_gpio", 72);
 	    if (xp4_old) {
 		nvram_set_int("led_green_gpio", 33);
 		nvram_set_int("led_red_gpio", 32);
 	    } else {
-		nvram_set_int("led_green_gpio", 32);
-		nvram_set_int("led_red_gpio", 33);
+		nvram_set_int("led_green_gpio", 73);
+		nvram_set_int("led_red_gpio", 71);
 	    }
-		nvram_set_int("btn_rst_gpio_1", 19|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_rst_gpio_1", 60|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio_1", 9|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_white_gpio", 22);
 
 		/* enable bled */
@@ -6025,9 +6026,9 @@ int init_nvram(void)
 			nvram_set("wired_ifnames", "");
 		else { // HwId A, XP4R only PLC(eth1) is dynamic WAN/LAN
 			if (aimesh_re_node())
-				nvram_set("wired_ifnames", "eth2 eth3");
+				nvram_set("wired_ifnames", "eth2 eth3 eth0");
 			else
-				nvram_set("wired_ifnames", "eth2 eth3 eth1");
+				nvram_set("wired_ifnames", "eth2 eth3 eth1 eth0");
 		}
 #endif
 
@@ -6038,7 +6039,7 @@ int init_nvram(void)
 				nvram_set("eth_ifnames", "");
 			} else {
 				nvram_set("wl1_channel", "36"); /* fixed channel speeds up sta1 connection */
-				nvram_set("eth_ifnames", "eth1 eth2 eth3"); /* PLC, LAN1, LAN2 */
+				nvram_set("eth_ifnames", "eth0 eth1 eth2 eth3"); /* PLC, LAN1, LAN2 */
 				nvram_set("amas_ethif_type", "65536 4 4"); /* PLC, 1G, 1G */
 				nvram_set("eth_priority", "0 3 1" " 1 1 1" " 2 2 1"); /* PLC priority:3, LAN1:1, LAN2:2 */
 				nvram_set("sta_priority", "2 0 5 1" " 5 1 4 1"); /* 2G priority:5, 5G priority:4 */
@@ -6053,7 +6054,7 @@ int init_nvram(void)
 				_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
 							__func__, __LINE__,
 							sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
-				nvram_set("eth_ifnames", "eth1 eth4"); /* PLC(eth1), normal WAN(eth4)*/
+				nvram_set("eth_ifnames", "eth0 eth1 eth4"); /* PLC(eth1), normal WAN(eth4)*/
 				nvram_set("fixed_eth_ifnames", "eth4"); /* XP4R WAN(eth4) only as wan */
 				nvram_set("amas_ethif_type", "65536 4"); /* PLC, 1G */
 				nvram_set("eth_priority", "0 2 1" " 1 1 1"); /* PLC priority:2, WAN priority:1 */
@@ -6072,7 +6073,7 @@ int init_nvram(void)
 		}
 
 		/* interface name & type mapping for lldp */
-		nvram_set("amas_lldp_ifnames", "eth1 eth2 eth3"); /* PLC, LAN1, LAN2 */
+		nvram_set("amas_lldp_ifnames", "eth0 eth1 eth2 eth3"); /* PLC, LAN1, LAN2 */
 		nvram_set("amas_lldp_iftypes", "65536 4 4"); /* PLC, 1G, 1G */
 #endif
 		} // XP4
