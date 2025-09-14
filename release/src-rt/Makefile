@@ -2985,7 +2985,7 @@ define RouterOptions
 	fi; \
 	if [ "$(FORCE_AUTO_UPGRADE)" = "y" ]; then \
 		sed -i "/RTCONFIG_FORCE_AUTO_UPGRADE/d" $(1); \
-		echo "RTCONFIG_FORCE_AUTO_UPGRADE=y" >>$(1); \
+		echo "# RTCONFIG_FORCE_AUTO_UPGRADE is not set" >>$(1); \
 	fi; \
 	if [ "$(TUXERA_SMBD)" = "y" ]; then \
 		sed -i "/RTCONFIG_TUXERA_SMBD/d" $(1); \
@@ -3767,6 +3767,10 @@ define RouterOptions
 	if [ "$(SWRT)" = "y" ]; then \
 	sed -i "/RTCONFIG_SWRT\>/d" $(1); \
 	echo "RTCONFIG_SWRT=y" >>$(1); \
+	fi; \
+	if [ "$(SWRT_UU)" = "y" ]; then \
+	sed -i "/RTCONFIG_SWRT_UU\>/d" $(1); \
+	echo "RTCONFIG_SWRT_UU=y" >>$(1); \
 	fi; \
 	)
 	$(call platformRouterOptions, $(1))
