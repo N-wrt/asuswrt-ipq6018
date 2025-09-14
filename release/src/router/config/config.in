@@ -2524,4 +2524,3 @@ config RTCONFIG_SWRT
 config RTCONFIG_SWRT_UU
 	bool "RTCONFIG_SWRT_UU"
 	default n
-
