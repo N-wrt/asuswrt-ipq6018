@@ -220,7 +220,7 @@ location.href = "/Softcenter.asp";
 										</div>
 										<div style="margin:30px 0 10px 5px;" class="splitLine"></div>
 										<div class="scBottom">
-											webui by： <i>paldier</i><br/>
+											webui by： <i>paldier&NWRT</i><br/>
 										</div>
 
 									</td>
