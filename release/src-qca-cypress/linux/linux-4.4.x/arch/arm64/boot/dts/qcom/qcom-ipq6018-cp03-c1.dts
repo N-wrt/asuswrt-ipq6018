@@ -307,9 +307,7 @@
 };
 
 &nand {
-	pinctrl-0 = <&qpic_pins>;
-	pinctrl-names = "default";
-	status = "ok";
+	status = "disabled";
 };
 
 &ssphy_0 {
