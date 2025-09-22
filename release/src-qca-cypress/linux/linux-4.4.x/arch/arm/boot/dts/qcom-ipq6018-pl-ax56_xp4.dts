@@ -26,10 +26,6 @@
         qcom,msm-id = <0x192 0x0>;
 
 	aliases {
-		led-boot = "/soc/leds/status_red";
-		led-failsafe = "/soc/leds/status_red";
-		led-running = "/soc/leds/status_green";
-		led-upgrade = "/soc/leds/status_green";
                 serial0 = &blsp1_uart3;
 		/*
 		 * Aliases as required by u-boot
@@ -37,10 +33,16 @@
 		 */
 		ethernet0 = "/soc/dp1";
 		ethernet1 = "/soc/dp2";
-		ethernet2 = "/soc/dp3";
-		ethernet3 = "/soc/dp4";
-		ethernet4 = "/soc/dp5";
+                ethernet2 = "/soc/dp3";
+                ethernet3 = "/soc/dp4";
+                ethernet4 = "/soc/dp5";
 	};
+
+	chosen {
+		// 修改内核命令行参数，添加block2mtd配置
+		bootargs-override = "console=ttyMSM0,115200n8 root=/dev/mmcblk0p18 rootwait rootfstype=squashfs,ext4 swiotlb=1 coherent_pool=2M block2mtd.block2mtd=/dev/mmcblk0p25,131072,UBI_DEV ubi.mtd=UBI_DEV";
+	};
+
 };
 
 &tlmm {
@@ -62,129 +64,13 @@
 		};
 	};
 
-	qpic_pins: qpic_pins {
-		data_0 {
-			pins = "gpio15";
-			function = "qpic_pad0";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		data_1 {
-			pins = "gpio12";
-			function = "qpic_pad1";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		data_2 {
-			pins = "gpio13";
-			function = "qpic_pad2";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		data_3 {
-			pins = "gpio14";
-			function = "qpic_pad3";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		data_4 {
-			pins = "gpio5";
-			function = "qpic_pad4";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		data_5 {
-			pins = "gpio6";
-			function = "qpic_pad5";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		data_6 {
-			pins = "gpio7";
-			function = "qpic_pad6";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		data_7 {
-			pins = "gpio8";
-			function = "qpic_pad7";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-		qpic_pad {
-			pins = "gpio1", "gpio3", "gpio4",
-			       "gpio10", "gpio11", "gpio17";
-			function = "qpic_pad";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-	};
-
-	button_pins: button_pins {
-		wps_button {
-			pins = "gpio19";
-			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-up;
-		};
-
-		reset_button {
-			pins = "gpio68";
-			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-up;
-		};
-	};
-
-	mdio_pins: mdio_pinmux {
-		mux_0 {
-			pins = "gpio64";
-			function = "mdc";
-			drive-strength = <8>;
-			bias-pull-up;
-		};
-		mux_1 {
-			pins = "gpio65";
-			function = "mdio";
-			drive-strength = <8>;
-			bias-pull-up;
-		};
-		mux_2 {
-			pins = "gpio75";
-			function = "gpio";
-			bias-pull-up;
-		};
-	};
-
-	leds_pins: leds_pins {
-		red {
-			pins = "gpio71";
-			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-
-		orange {
-			pins = "gpio72";
-			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-
-		green {
-			pins = "gpio73";
-			function = "gpio";
-			drive-strength = <8>;
-			bias-pull-down;
-		};
-	};
 };
 
 &soc {
 	mdio@90000 {
 		pinctrl-0 = <&mdio_pins>;
 		pinctrl-names = "default";
-		phy-reset-gpio = <&tlmm 75 0 &tlmm 77 1>;
+		phy-reset-gpio = <&tlmm 75 0>;
 		status = "ok";
 		phy0: ethernet-phy@0 {
 			reg = <0>;
@@ -213,41 +99,29 @@
 		switch_mac_mode2 = <0xff>; /* mac mode for uniphy instance2*/
 		qcom,port_phyinfo {
                         port@0 {
-                                port_id = <5>;
-                                phy_address = <4>;
-                        };
-                        port@1 {
                                 port_id = <1>;
                                 phy_address = <0>;
                         };
-                        port@2 {
+                        port@1 {
                                 port_id = <2>;
                                 phy_address = <1>;
                         };
-			port@3 {
+                        port@2 {
                                 port_id = <3>;
                                 phy_address = <2>;
                         };
-			port@4 {
+			port@3 {
 				port_id = <4>;
 				phy_address = <3>;
+			};
+			port@4 {
+				port_id = <5>;
+				phy_address = <4>;
 			};
 		};
 	};
 
 	dp1 {
-		device_type = "network";
-		compatible = "qcom,nss-dp";
-		qcom,id = <5>;
-		reg = <0x3a001800 0x200>;
-		qcom,mactype = <0>;
-		local-mac-address = [000000000000];
-		qcom,link-poll = <1>;
-		qcom,phy-mdio-addr = <4>;
-		phy-mode = "sgmii";
-	};
-
-	dp2 {
 		device_type = "network";
 		compatible = "qcom,nss-dp";
 		qcom,id = <1>;
@@ -259,7 +133,7 @@
 		phy-mode = "sgmii";
 	};
 
-        dp3 {
+	dp2 {
 		device_type = "network";
 		compatible = "qcom,nss-dp";
 		qcom,id = <2>;
@@ -271,7 +145,7 @@
 		phy-mode = "sgmii";
 	};
 
-        dp4 {
+        dp3 {
                 device_type = "network";
                 compatible = "qcom,nss-dp";
                 qcom,id = <3>;
@@ -283,7 +157,7 @@
                 phy-mode = "sgmii";
         };
 
-        dp5 {
+        dp4 {
                 device_type = "network";
                 compatible = "qcom,nss-dp";
                 qcom,id = <4>;
@@ -295,35 +169,25 @@
                 phy-mode = "sgmii";
         };
 
+        dp5 {
+                device_type = "network";
+                compatible = "qcom,nss-dp";
+                qcom,id = <5>;
+                reg = <0x3a001800 0x200>;
+                qcom,mactype = <0>;
+                local-mac-address = [000000000000];
+                qcom,link-poll = <1>;
+                qcom,phy-mdio-addr = <4>;
+                phy-mode = "sgmii";
+        };
+
 	leds {
-		compatible = "gpio-leds";
-		pinctrl-0 = <&leds_pins>;
-		pinctrl-names = "default";
-		status = "ok";
-
-		led_red: status_red {
-			label = "v6:red:status";
-			gpio = <&tlmm 71 GPIO_ACTIVE_HIGH>;
-		};
-
-		led_orange: status_orange {
-			label = "v6:orange:status";
-			gpio = <&tlmm 72 GPIO_ACTIVE_HIGH>;
-		};
-
-		led_green: status_green {
-			label = "v6:green:status";
-			gpio = <&tlmm 73 GPIO_ACTIVE_HIGH>;
-		};
+	        status = "disabled";
 	};
-
 
 	nss@40000000 {
 		qcom,max-frequency = <0x64b54000>;
 	};
-
-
-
 
 	serial@78b0000 {
 	        status = "disabled";
@@ -332,30 +196,16 @@
 	blsp1_uart2: serial@78b0000 {
 	        status = "disabled";
 	};
+
+	wifi0: wifi@c000000 {
+			status = "ok";
+	};
+
 };
 
-&cpus {
-		opp_table0 {
-
-			opp04 {
-				opp-hz = <0x0 0x55d4a800>;
-				opp-microvolt = <0x4>;
-				clock-latency-ns = <0x30d40>;
-			};
-
-			opp05 {
-				opp-hz = <0x0 0x5fd82200>;
-				opp-microvolt = <0x5>;
-				clock-latency-ns = <0x30d40>;
-			};
-
-			opp06 {
-				opp-hz = <0x0 0x6b49d200>;
-				opp-microvolt = <0x6>;
-				clock-latency-ns = <0x30d40>;
-			};
-		};
-	};
+&usb3 {
+    status = "ok";
+};
 
 &blsp1_uart3 {
 	pinctrl-0 = <&uart_pins>;

@@ -859,8 +859,8 @@ endif
 	asustools/mkits.sh -D qcom-ipq6018-cp03-c1 -o image/fit-qcom-ipq6018-cp03-c1.its -k $(PLATFORMDIR)/zImage.img -r $(PLATFORMDIR)/target.image -d $(LINUXDIR)/arch/arm/boot/dts/qcom-ipq6018-$(lowercase_B).dtb -C lzma -a 0x$(LOADADDR) -e 0x$(ENTRYADDR) -A $(ARCH) -v $(KERNEL_VER)
 	asustools/mkimage -f image/fit-qcom-ipq6018-cp03-c1.its image/$(IMGNAME).img
 ifeq ($(UBIIMG),y)
-	scripts/mkits.sh -D qcom-ipq6018-cp03-c1 -o image/fit-qcom-ipq6018-cp03-c1-ubi.its -k $(PLATFORMDIR)/Image.img -d $(LINUXDIR)/arch/arm/boot/dts/qcom-ipq6018-$(lowercase_B)-ubi.dtb  -C gzip -a 0x$(LOADADDR) -e 0x$(ENTRYADDR)  -c config@cp03-c1 -A $(ARCH) -v $(KERNEL_VER)
-	asustools/mkimage -f image/fit-qcom-ipq6018-cp03-c1-ubi.its image/$(IMGNAME).u
+	scripts/mkits.sh -D qcom-ipq6018-cp03-c1 -o image/fit-qcom-ipq6018-cp03-c1.its -k $(PLATFORMDIR)/Image.img -d $(LINUXDIR)/arch/arm/boot/dts/qcom-ipq6018-$(lowercase_B).dtb  -C gzip -a 0x$(LOADADDR) -e 0x$(ENTRYADDR)  -c config@cp03-c1 -A $(ARCH) -v $(KERNEL_VER)
+	asustools/mkimage -f image/fit-qcom-ipq6018-cp03-c1.its image/$(IMGNAME).u
 	scripts/ubinize-image.sh    --kernel image/$(IMGNAME).u  $(PLATFORMDIR)/target.image Factory/$(lowercase_B).bin image/$(IMGNAME).ubi  -p 128KiB -m 2048
 endif
 else ifeq ($(IPQ50XX),y)

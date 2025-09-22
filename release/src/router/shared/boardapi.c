@@ -53,7 +53,7 @@ static const struct led_btn_table_s {
 } led_btn_table[] = {
 	/* button */
 	{ "btn_rst_gpio_1",	&btn_gpio_table[BTN_RESET] },
-	{ "btn_wps_gpio_1",	&btn_gpio_table[BTN_WPS] },
+	{ "btn_wps_gpio",	&btn_gpio_table[BTN_WPS] },
 #ifdef RTCONFIG_SWMODE_SWITCH
 #if defined(PLAC66U)
 	{ "btn_swmode1_gpio",	&btn_gpio_table[BTN_SWMODE_SW_ROUTER] },
@@ -337,7 +337,7 @@ int extract_gpio_pin(const char *gpio)
 
 int init_gpio(void)
 {
-	char *btn_list[] = { "btn_rst_gpio_1", "btn_wps_gpio_1", "fan_gpio", "have_fan_gpio"
+	char *btn_list[] = { "btn_rst_gpio_1", "btn_wps_gpio", "fan_gpio", "have_fan_gpio"
 #ifdef RTCONFIG_WIRELESS_SWITCH
 		, "btn_wifi_gpio"
 #endif

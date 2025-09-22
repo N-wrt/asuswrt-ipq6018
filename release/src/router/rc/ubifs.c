@@ -29,7 +29,7 @@
 #define JFFS2_MTD_NAME	"jffs2"
 #define UBI_DEV_NUM	"0"
 #define UBI_DEV_PATH	"/dev/ubi"UBI_DEV_NUM
-#define LEBS		0x1F000		/* 124 KiB */
+#define LEBS		0x20000		/* 128 KiB */
 #define NUM_OH_LEB	24		/* for ubifs overhead */
 #endif
 #if defined(RTCONFIG_BCMARM)
@@ -39,7 +39,7 @@
 #define UBI_DEV_NUM	"0"
 #define UBI_DEV_PATH	"/dev/ubi0"
 #define UBI_JFFS_PATH	"/dev/ubi0_0"
-#define LEBS		0x1F000		/* 124 KiB */
+#define LEBS		0x20000		/* 128 KiB */
 #define NUM_OH_LEB	20		/* for ubifs overhead */
 #else
 //bcm4908/bcm6750/bcm6755
@@ -54,7 +54,7 @@
 #define UBI_JFFS_PATH	UBI_DEV_PATH"_0"
 #define PATH_MAX	512
 #define JFFS2_MTD_NAME	"misc2"
-#define LEBS		0x1F000		/* 124 KiB */
+#define LEBS		0x20000		/* 128 KiB */
 #define NUM_OH_LEB	20		/* for ubifs overhead */
 #endif
 #endif
