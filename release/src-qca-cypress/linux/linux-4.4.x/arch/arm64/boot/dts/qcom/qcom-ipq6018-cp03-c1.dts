@@ -326,6 +326,19 @@
 	status = "ok";
 };
 
+&cpu0_opp_table {
+	compatible = "operating-points-v2";
+	opp-shared;
+	opp03 {
+		opp-hz = /bits/ 64 <1200000000>;
+		opp-microvolt = <3>;
+		clock-latency-ns = <200000>;
+	};
+	/delete-node/ opp04;
+	/delete-node/ opp05;
+	/delete-node/ opp06;
+};
+
 /* TZAPP is enabled in default memory profile only */
 #if !defined(__IPQ_MEM_PROFILE_256_MB__) && !defined(__IPQ_MEM_PROFILE_512_MB__)
 &qseecom {

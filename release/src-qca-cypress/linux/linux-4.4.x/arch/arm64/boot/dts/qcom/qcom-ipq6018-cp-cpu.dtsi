@@ -15,22 +15,69 @@
  */
 
 &CPU0 {
-	operating-points = <0xd2f00 0x10c8e0 0x101d00 0x10c8e0 0x124f80 0x10c8e0>;
-	clock-latency = <0x30d40>;
+	operating-points-v2 = <&cpu0_opp_table>;
+	voltage-tolerance = <1>;
+	cpu0-supply = <&apc_vreg>;
+	enable-cpu-regulator;
 };
 
 &CPU1 {
-	operating-points = <0xd2f00 0x10c8e0 0x101d00 0x10c8e0 0x124f80 0x10c8e0>;
-	clock-latency = <0x30d40>;
+	operating-points-v2 = <&cpu0_opp_table>;
+	voltage-tolerance = <1>;
+	cpu-supply = <&apc_vreg>;
 };
 
 &CPU2 {
-	operating-points = <0xd2f00 0x10c8e0 0x101d00 0x10c8e0 0x124f80 0x10c8e0>;
-	clock-latency = <0x30d40>;
+	operating-points-v2 = <&cpu0_opp_table>;
+	voltage-tolerance = <1>;
+	cpu-supply = <&apc_vreg>;
 };
 
 &CPU3 {
-	operating-points = <0xd2f00 0x10c8e0 0x101d00 0x10c8e0 0x124f80 0x10c8e0>;
-	clock-latency = <0x30d40>;
+	operating-points-v2 = <&cpu0_opp_table>;
+	voltage-tolerance = <1>;
+	cpu-supply = <&apc_vreg>;
 };
 
+&cpus {
+	cpu0_opp_table: opp_table0 {
+		compatible = "operating-points-v2";
+		opp-shared;
+
+		opp00 {
+			opp-hz = /bits/ 64 <0>;
+			opp-microvolt = <0>;
+			clock-latency-ns = <200000>;
+		};
+		opp01 {
+			opp-hz = /bits/ 64 <864000000>;
+			opp-microvolt = <1>;
+			clock-latency-ns = <200000>;
+		};
+		opp02 {
+			opp-hz = /bits/ 64 <1056000000>;
+			opp-microvolt = <2>;
+			clock-latency-ns = <200000>;
+		};
+		opp03 {
+			opp-hz = /bits/ 64 <1320000000>;
+			opp-microvolt = <3>;
+			clock-latency-ns = <200000>;
+		};
+		opp04 {
+			opp-hz = /bits/ 64 <1440000000>;
+			opp-microvolt = <4>;
+			clock-latency-ns = <200000>;
+		};
+		opp05 {
+			opp-hz = /bits/ 64 <1608000000>;
+			opp-microvolt = <5>;
+			clock-latency-ns = <200000>;
+		};
+		opp06 {
+			opp-hz = /bits/ 64 <1800000000>;
+			opp-microvolt = <6>;
+			clock-latency-ns = <200000>;
+		};
+	};
+};

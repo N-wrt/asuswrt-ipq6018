@@ -685,7 +685,7 @@
 				      "axi_m_sticky",
 				      "axi_s_sticky";
 
-			perst-gpio = <&tlmm 53 1>;
+			perst-gpio = <&tlmm 60 1>;
 			status = "disabled";
 		};
 
