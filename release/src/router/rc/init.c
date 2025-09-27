@@ -5950,7 +5950,7 @@ int init_nvram(void)
 		nvram_set_int("btn_rst_gpio", 0|GPIO_ACTIVE_LOW);
 	    else
 		nvram_set_int("btn_rst_gpio", 34|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_wps_gpio", 9);
+		nvram_set_int("btn_wps_gpio", 9|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_blue_gpio", 35);
 	    if (xp4_old) {
 		nvram_set_int("led_green_gpio", 33);
@@ -5959,8 +5959,7 @@ int init_nvram(void)
 		nvram_set_int("led_green_gpio", 50);
 		nvram_set_int("led_red_gpio", 37);
 	    }
-		nvram_set_int("btn_rst_gpio_1", 8);
-		nvram_set_int("led_white_gpio", 22);
+		nvram_set_int("btn_rst_gpio_1", 8|GPIO_ACTIVE_LOW);
 
 		/* enable bled */
 		config_netdev_bled("led_blue_gpio", "ath1");
@@ -6073,7 +6072,7 @@ int init_nvram(void)
 
 		/* interface name & type mapping for lldp */
 		nvram_set("amas_lldp_ifnames", "eth2 eth3"); /* PLC, LAN1, LAN2 */
-		nvram_set("amas_lldp_iftypes", "65536 4 4"); /* PLC, 1G, 1G */
+		nvram_set("amas_lldp_iftypes", "4 4"); /* PLC, 1G, 1G */
 #endif
 		} // XP4
 		break;

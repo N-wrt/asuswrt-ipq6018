@@ -12392,9 +12392,109 @@ again:
 #else /* !RTCONFIG_REALTEK */
 #if defined(RTCONFIG_QCA) && defined(RTCONFIG_FITFDT)
 					{
-						char header_size[20];
-						snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
-						eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
+						// char header_size[20];
+						// snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
+						// eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
+
+    // 已知 header_size = 64 字节
+    int header_size = 64;
+    int part1_size = 3999832;  // kernel 部分大小
+    int trailer_size = 24;     // 包尾24字节
+    
+    char cmd[512];
+    
+    // 获取整个升级文件的大小
+    struct stat st;
+    stat(upgrade_file, &st);
+    int total_size = st.st_size;
+    
+    // 计算rootfs大小：总大小 - 头部64字节 - 内核3999832字节 - 包尾24字节
+    int rootfs_size = total_size - header_size - part1_size - trailer_size;
+    
+    printf("File size analysis:\n");
+    printf("Total size: %d bytes\n", total_size);
+    printf("Header: %d bytes\n", header_size);
+    printf("Kernel: %d bytes\n", part1_size);
+    printf("Rootfs: %d bytes\n", rootfs_size);
+    printf("Trailer: %d bytes\n", trailer_size);
+    
+    // 使用tail和head提取kernel部分
+    // tail -c +65 跳过前64字节，head -c 3999832 取3999832字节
+    printf("Extracting kernel.bin...\n");
+    snprintf(cmd, sizeof(cmd), "tail -c +65 %s | head -c %d > /tmp/kernel.bin", 
+             upgrade_file, part1_size);
+    printf("Executing: %s\n", cmd);
+    system(cmd);
+    
+    // 检查kernel文件大小
+    system("ls -la /tmp/kernel.bin | awk '{print $5, $9}'");
+    
+    // 使用tail和head提取rootfs部分
+    // tail -c +3999897 跳过前64+3999832=3999896字节，取rootfs_size字节
+    printf("Extracting rootfs.bin...\n");
+    int rootfs_start = header_size + part1_size + 1;  // tail -c +N 是从第N字节开始
+    snprintf(cmd, sizeof(cmd), "tail -c +%d %s | head -c %d > /tmp/rootfs.bin", 
+             rootfs_start, upgrade_file, rootfs_size);
+    printf("Executing: %s\n", cmd);
+    system(cmd);
+    
+    // 检查rootfs文件大小
+    system("ls -la /tmp/rootfs.bin | awk '{print $5, $9}'");
+    
+    // 获取rootfs实际字节数并计算块数
+    printf("Calculating rootfs blocks for EMMC writing...\n");
+    FILE *fp = popen("ls -l /tmp/rootfs.bin | awk '{print $5}'", "r");
+    int rootfs_bytes = 0;
+    if (fp) {
+        char size_str[20];
+        if (fgets(size_str, sizeof(size_str), fp)) {
+            rootfs_bytes = atoi(size_str);
+        }
+        pclose(fp);
+    }
+    
+    // 计算512字节块数并进行128块对齐（64KiB对齐）
+    int rootfs_blocks = (rootfs_bytes + 511) / 512;
+    int aligned_rootfs_blocks = ((rootfs_blocks + 127) & ~127);
+    
+    printf("Rootfs bytes: %d, blocks: %d, aligned blocks: %d\n", 
+           rootfs_bytes, rootfs_blocks, aligned_rootfs_blocks);
+    
+    // 刷入分区 - 使用512字节块操作
+    printf("Flashing to EMMC partitions with 512-byte blocks...\n");
+    
+    // 刷入kernel分区
+    system("dd if=/tmp/kernel.bin of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null");
+    printf("Kernel flashed to /dev/mmcblk0p17\n");
+    
+    // 刷入rootfs分区
+    snprintf(cmd, sizeof(cmd), "dd if=/tmp/rootfs.bin of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
+             rootfs_blocks);
+    system(cmd);
+    printf("Rootfs data flashed to /dev/mmcblk0p18 (%d blocks)\n", rootfs_blocks);
+    
+    // 对齐填充
+    if (aligned_rootfs_blocks > rootfs_blocks) {
+        int fill_blocks = aligned_rootfs_blocks - rootfs_blocks;
+        printf("Filling %d blocks with zeros for 64KiB alignment...\n", fill_blocks);
+        
+        snprintf(cmd, sizeof(cmd), "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
+                 rootfs_blocks, fill_blocks);
+        system(cmd);
+        printf("Alignment padding completed\n");
+    }
+    
+    // 同步文件系统
+    system("sync");
+    
+    // 清理临时文件
+    printf("Cleaning up temporary files...\n");
+    system("rm -f /tmp/kernel.bin /tmp/rootfs.bin");
+    
+    printf("EMMC upgrade completed successfully!\n");
+    printf("Rootfs aligned to %d blocks (%d KiB)\n", 
+           aligned_rootfs_blocks, aligned_rootfs_blocks * 512 / 1024);
+
 					}
 #else
 #ifdef RTCONFIG_MULTIFW
@@ -12686,9 +12786,109 @@ again:
 #else /* !RTCONFIG_REALTEK */
 #if defined(RTCONFIG_QCA) && defined(RTCONFIG_FITFDT)
 					{
-						char header_size[20];
-						snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
-						eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
+						// char header_size[20];
+						// snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
+						// eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
+
+    // 已知 header_size = 64 字节
+    int header_size = 64;
+    int part1_size = 3999832;  // kernel 部分大小
+    int trailer_size = 24;     // 包尾24字节
+    
+    char cmd[512];
+    
+    // 获取整个升级文件的大小
+    struct stat st;
+    stat(upgrade_file, &st);
+    int total_size = st.st_size;
+    
+    // 计算rootfs大小：总大小 - 头部64字节 - 内核3999832字节 - 包尾24字节
+    int rootfs_size = total_size - header_size - part1_size - trailer_size;
+    
+    printf("File size analysis:\n");
+    printf("Total size: %d bytes\n", total_size);
+    printf("Header: %d bytes\n", header_size);
+    printf("Kernel: %d bytes\n", part1_size);
+    printf("Rootfs: %d bytes\n", rootfs_size);
+    printf("Trailer: %d bytes\n", trailer_size);
+    
+    // 使用tail和head提取kernel部分
+    // tail -c +65 跳过前64字节，head -c 3999832 取3999832字节
+    printf("Extracting kernel.bin...\n");
+    snprintf(cmd, sizeof(cmd), "tail -c +65 %s | head -c %d > /tmp/kernel.bin", 
+             upgrade_file, part1_size);
+    printf("Executing: %s\n", cmd);
+    system(cmd);
+    
+    // 检查kernel文件大小
+    system("ls -la /tmp/kernel.bin | awk '{print $5, $9}'");
+    
+    // 使用tail和head提取rootfs部分
+    // tail -c +3999897 跳过前64+3999832=3999896字节，取rootfs_size字节
+    printf("Extracting rootfs.bin...\n");
+    int rootfs_start = header_size + part1_size + 1;  // tail -c +N 是从第N字节开始
+    snprintf(cmd, sizeof(cmd), "tail -c +%d %s | head -c %d > /tmp/rootfs.bin", 
+             rootfs_start, upgrade_file, rootfs_size);
+    printf("Executing: %s\n", cmd);
+    system(cmd);
+    
+    // 检查rootfs文件大小
+    system("ls -la /tmp/rootfs.bin | awk '{print $5, $9}'");
+    
+    // 获取rootfs实际字节数并计算块数
+    printf("Calculating rootfs blocks for EMMC writing...\n");
+    FILE *fp = popen("ls -l /tmp/rootfs.bin | awk '{print $5}'", "r");
+    int rootfs_bytes = 0;
+    if (fp) {
+        char size_str[20];
+        if (fgets(size_str, sizeof(size_str), fp)) {
+            rootfs_bytes = atoi(size_str);
+        }
+        pclose(fp);
+    }
+    
+    // 计算512字节块数并进行128块对齐（64KiB对齐）
+    int rootfs_blocks = (rootfs_bytes + 511) / 512;
+    int aligned_rootfs_blocks = ((rootfs_blocks + 127) & ~127);
+    
+    printf("Rootfs bytes: %d, blocks: %d, aligned blocks: %d\n", 
+           rootfs_bytes, rootfs_blocks, aligned_rootfs_blocks);
+    
+    // 刷入分区 - 使用512字节块操作
+    printf("Flashing to EMMC partitions with 512-byte blocks...\n");
+    
+    // 刷入kernel分区
+    system("dd if=/tmp/kernel.bin of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null");
+    printf("Kernel flashed to /dev/mmcblk0p17\n");
+    
+    // 刷入rootfs分区
+    snprintf(cmd, sizeof(cmd), "dd if=/tmp/rootfs.bin of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
+             rootfs_blocks);
+    system(cmd);
+    printf("Rootfs data flashed to /dev/mmcblk0p18 (%d blocks)\n", rootfs_blocks);
+    
+    // 对齐填充
+    if (aligned_rootfs_blocks > rootfs_blocks) {
+        int fill_blocks = aligned_rootfs_blocks - rootfs_blocks;
+        printf("Filling %d blocks with zeros for 64KiB alignment...\n", fill_blocks);
+        
+        snprintf(cmd, sizeof(cmd), "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
+                 rootfs_blocks, fill_blocks);
+        system(cmd);
+        printf("Alignment padding completed\n");
+    }
+    
+    // 同步文件系统
+    system("sync");
+    
+    // 清理临时文件
+    printf("Cleaning up temporary files...\n");
+    system("rm -f /tmp/kernel.bin /tmp/rootfs.bin");
+    
+    printf("EMMC upgrade completed successfully!\n");
+    printf("Rootfs aligned to %d blocks (%d KiB)\n", 
+           aligned_rootfs_blocks, aligned_rootfs_blocks * 512 / 1024);
+
 					}
 #else
 #ifdef RTCONFIG_MULTIFW

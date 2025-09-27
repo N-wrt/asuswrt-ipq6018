@@ -181,10 +181,6 @@
                 phy-mode = "sgmii";
         };
 
-	leds {
-	        status = "disabled";
-	};
-
 	nss@40000000 {
 		qcom,max-frequency = <0x64b54000>;
 	};
