@@ -52,9 +52,9 @@ enum {
 	LAN1_PORT=0,
 	LAN2_PORT,
 	LAN3_PORT,
-	LAN4_PORT,
-	WAN_PORT,
-	MAX_WANLAN_PORT
+	LAN4_PORT=4,
+	WAN_PORT=3,
+	MAX_WANLAN_PORT=5
 };
 
 static const char *upstream_iptv_ifaces[16] = {
