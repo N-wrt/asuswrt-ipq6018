@@ -5917,6 +5917,7 @@ int init_nvram(void)
 		}
 		wl_ifaces[WL_5G_BAND] = "ath0";
 		wl_ifaces[WL_2G_BAND] = "ath1";
+		wl_ifaces[WL_5G_2_BAND] = "ath2";
 		//doSystem("ls /proc/device-tree/soc | grep dp | wc -l > /tmp/dp_cnt");
 		if (nvram_match("HwId", "A")) {
 #ifdef RTCONFIG_DUALWAN

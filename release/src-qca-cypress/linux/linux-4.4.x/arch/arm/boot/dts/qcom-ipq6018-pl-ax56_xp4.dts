@@ -214,6 +214,13 @@
 	        status = "disabled";
 	};
 };
+
+&blsp1_uart3 {
+	pinctrl-0 = <&uart_pins>;
+	pinctrl-names = "default";
+	status = "ok";
+};
+
 &usb2 {
 	status = "ok";
 };
@@ -222,8 +229,20 @@
 	status = "ok";
 };
 
-&blsp1_uart3 {
-	pinctrl-0 = <&uart_pins>;
-	pinctrl-names = "default";
+&pcie_phy {
 	status = "ok";
 };
+
+&pcie0 {
+	status = "ok";
+	perst-gpios = <&tlmm 53 GPIO_ACTIVE_LOW>;
+
+	pcie@0 {
+		wifi@0,0 {
+			status = "okay";
+			compatible = "pci17cb,1104";
+			reg = <0x00010000 0 0 0 0>;
+		};
+	};
+};
+
