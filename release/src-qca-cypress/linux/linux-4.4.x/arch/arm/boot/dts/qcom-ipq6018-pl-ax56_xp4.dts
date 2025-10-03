@@ -64,6 +64,17 @@
 		};
 	};
 
+	extcon_usb_pins: extcon_usb_pins {
+		mux {
+			pins = "gpio22";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-down;
+			output-high;
+		};
+	};
+
+
 };
 
 &soc {
@@ -203,9 +214,12 @@
 	        status = "disabled";
 	};
 };
+&usb2 {
+	status = "ok";
+};
 
 &usb3 {
-    status = "ok";
+	status = "ok";
 };
 
 &blsp1_uart3 {

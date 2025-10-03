@@ -5950,16 +5950,18 @@ int init_nvram(void)
 		nvram_set_int("btn_rst_gpio", 0|GPIO_ACTIVE_LOW);
 	    else
 		nvram_set_int("btn_rst_gpio", 34|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_wps_gpio", 9);
-		nvram_set_int("led_blue_gpio", 69);
+		nvram_set_int("btn_wps_gpio", 9|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_blue_gpio", 79);
 	    if (xp4_old) {
 		nvram_set_int("led_green_gpio", 33);
 		nvram_set_int("led_red_gpio", 32);
 	    } else {
-		nvram_set_int("led_green_gpio", 70);
-		nvram_set_int("led_red_gpio", 50);
+		nvram_set_int("led_green_gpio", 58);
+		nvram_set_int("led_red_gpio", 57);
 	    }
-		nvram_set_int("btn_rst_gpio_1", 42);
+		nvram_set_int("btn_rst_gpio_1", 56|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio_1", 72|GPIO_ACTIVE_LOW);
+		nvram_set_int("pwr_usb_gpio", 22);
 
 		/* enable bled */
 		config_netdev_bled("led_blue_gpio", "ath1");
