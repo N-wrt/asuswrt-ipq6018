@@ -33,9 +33,9 @@
 		 */
 		ethernet0 = "/soc/dp1";
 		ethernet1 = "/soc/dp2";
-                ethernet2 = "/soc/dp3";
-                ethernet3 = "/soc/dp4";
-                ethernet4 = "/soc/dp5";
+		ethernet2 = "/soc/dp3";
+		ethernet3 = "/soc/dp4";
+		ethernet4 = "/soc/dp5";
 	};
 
 	chosen {
@@ -67,57 +67,25 @@
 };
 
 &soc {
-	mdio@90000 {
+	mdio: mdio@90000 {
 		pinctrl-0 = <&mdio_pins>;
 		pinctrl-names = "default";
-		phy-reset-gpio = <&tlmm 75 0>;
+		phy-reset-gpio = <&tlmm 77 0>;
 		status = "ok";
 		phy0: ethernet-phy@0 {
-			reg = <0>;
+			reg = <24>;
 		};
 		phy1: ethernet-phy@1 {
-			reg = <1>;
+			reg = <25>;
 		};
-                phy2: ethernet-phy@2 {
-                        reg = <2>;
-                };
-                phy3: ethernet-phy@3 {
-                        reg = <3>;
-                };
-                phy4: ethernet-phy@4 {
-                        reg = <4>;
-                };
-	};
-
-	ess-switch@3a000000 {
-		switch_cpu_bmp = <0x1>;  /* cpu port bitmap */
-		switch_lan_bmp = <0x1e>; /* lan port bitmap */
-		switch_wan_bmp = <0x20>; /* wan port bitmap */
-		switch_inner_bmp = <0xc0>; /*inner port bitmap*/
-		switch_mac_mode = <0x0>; /* mac mode for uniphy instance0*/
-		switch_mac_mode1 = <0xff>; /* mac mode for uniphy instance1*/
-		switch_mac_mode2 = <0xff>; /* mac mode for uniphy instance2*/
-		qcom,port_phyinfo {
-                        port@0 {
-                                port_id = <1>;
-                                phy_address = <0>;
-                        };
-                        port@1 {
-                                port_id = <2>;
-                                phy_address = <1>;
-                        };
-                        port@2 {
-                                port_id = <3>;
-                                phy_address = <2>;
-                        };
-			port@3 {
-				port_id = <4>;
-				phy_address = <3>;
-			};
-			port@4 {
-				port_id = <5>;
-				phy_address = <4>;
-			};
+		phy2: ethernet-phy@2 {
+			reg = <26>;
+		};
+		phy3: ethernet-phy@3 {
+			reg = <27>;
+		};
+		phy4: ethernet-phy@4 {
+			reg = <12>;
 		};
 	};
 
@@ -129,7 +97,7 @@
 		qcom,mactype = <0>;
 		local-mac-address = [000000000000];
 		qcom,link-poll = <1>;
-		qcom,phy-mdio-addr = <0>;
+		qcom,phy-mdio-addr = <24>;
 		phy-mode = "sgmii";
 	};
 
@@ -141,50 +109,92 @@
 		qcom,mactype = <0>;
 		local-mac-address = [000000000000];
 		qcom,link-poll = <1>;
-		qcom,phy-mdio-addr = <1>;
+		qcom,phy-mdio-addr = <25>;
 		phy-mode = "sgmii";
 	};
 
-        dp3 {
-                device_type = "network";
-                compatible = "qcom,nss-dp";
-                qcom,id = <3>;
-                reg = <0x3a001400 0x200>;
-                qcom,mactype = <0>;
-                local-mac-address = [000000000000];
-                qcom,link-poll = <1>;
-                qcom,phy-mdio-addr = <2>;
-                phy-mode = "sgmii";
-        };
-
-        dp4 {
-                device_type = "network";
-                compatible = "qcom,nss-dp";
-                qcom,id = <4>;
-                reg = <0x3a001600 0x200>;
-                qcom,mactype = <0>;
-                local-mac-address = [000000000000];
-                qcom,link-poll = <1>;
-                qcom,phy-mdio-addr = <3>;
-                phy-mode = "sgmii";
-        };
-
-        dp5 {
-                device_type = "network";
-                compatible = "qcom,nss-dp";
-                qcom,id = <5>;
-                reg = <0x3a001800 0x200>;
-                qcom,mactype = <0>;
-                local-mac-address = [000000000000];
-                qcom,link-poll = <1>;
-                qcom,phy-mdio-addr = <4>;
-                phy-mode = "sgmii";
-        };
-
-	nss@40000000 {
-		qcom,max-frequency = <0x64b54000>;
+	dp3 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <3>;
+		reg = <0x3a001400 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <26>;
+		phy-mode = "sgmii";
 	};
 
+	dp4 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <4>;
+		reg = <0x3a001600 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <27>;
+		phy-mode = "sgmii";
+	};
+
+	dp5 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <5>;
+		reg = <0x3a001800 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <12>;
+		phy-mode = "sgmii";
+	};
+
+	nss-macsec0 {
+		compatible = "qcom,nss-macsec";
+		phy_addr = <0x10>;
+		phy_access_mode = <0>;
+		mdiobus = <&mdio>;
+	};
+	nss-macsec1 {
+		compatible = "qcom,nss-macsec";
+		phy_addr = <0x14>;
+		phy_access_mode = <0>;
+		mdiobus = <&mdio>;
+	};
+
+	ess-switch@3a000000 {
+		switch_cpu_bmp = <0x1>;  /* cpu port bitmap */
+		switch_lan_bmp = <0x1e>; /* lan port bitmap */
+		switch_wan_bmp = <0x20>; /* wan port bitmap */
+		switch_inner_bmp = <0xc0>; /*inner port bitmap*/
+		switch_mac_mode = <0x0>; /* mac mode for uniphy instance0*/
+		switch_mac_mode1 = <0xf>; /* mac mode for uniphy instance1*/
+		switch_mac_mode2 = <0xff>; /* mac mode for uniphy instance2*/
+		qcom,port_phyinfo {
+			port@0 {
+				port_id = <1>;
+				phy_address = <24>;
+			};
+			port@1 {
+				port_id = <2>;
+				phy_address = <25>;
+			};
+			port@2 {
+				port_id = <3>;
+				phy_address = <26>;
+			};
+			port@3 {
+				port_id = <4>;
+				phy_address = <27>;
+			};
+			port@4 {
+				port_id = <5>;
+				phy_address = <12>;
+				port_mac_sel = "QGMAC_PORT";
+			};
+		};
+	};
+	
 	serial@78b0000 {
 	        status = "disabled";
 	};
@@ -192,11 +202,6 @@
 	blsp1_uart2: serial@78b0000 {
 	        status = "disabled";
 	};
-
-	wifi0: wifi@c000000 {
-			status = "ok";
-	};
-
 };
 
 &usb3 {
