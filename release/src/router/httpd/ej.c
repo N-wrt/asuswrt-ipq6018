@@ -61,7 +61,7 @@ struct REPLACE_PRODUCTID_S replace_productid_t[] =
 	{"ZenWiFi_CD6R", "ZenWiFi AC Mini", "global"},
 	{"ZenWiFi_CD6N", "ZenWiFi AC Mini", "global"},
 	{"ZenWiFi_XP4", "Redmi AX5", "global"},
-	{"ZenWiFi_XP4", "Redmi AX5", "CN"},
+	{"ZenWiFi_XP4", "红米 AX5", "CN"},
 	{"ZenWiFi_CV4", "ZenWiFi Voice", "global"},
 	{NULL, NULL, NULL}
 };

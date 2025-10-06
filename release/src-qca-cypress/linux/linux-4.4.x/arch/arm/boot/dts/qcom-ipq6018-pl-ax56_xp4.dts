@@ -138,7 +138,6 @@
 		qcom,link-poll = <1>;
 		qcom,phy-mdio-addr = <1>;
 		phy-mode = "sgmii";
-		keep-forward = <1>;
 	};
 
         dp3 {
