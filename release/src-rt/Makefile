@@ -300,6 +300,8 @@ ifeq ($(OPDBG),y)
 export IMGNAME := $(IMGNAME)_OPDBG
 endif
 
+NEW_IMGNAME := $(subst $(BUILD_NAME),$(REAL_NAME),$(IMGNAME))
+
 ifeq ($(DSL_REMOTE),y)
 ifeq ($(BUILD_NAME),DSL-AC68U)
 TCFWVER := $(shell cat ./tc_fw/fwver.conf)
@@ -891,7 +893,7 @@ endif
 		echo "PAD2: $${PAD2}" ; \
 	asustools/mkimage -A $${TRANS_ARCH} -O linux -T kernel -C lzma -a $(LOADADDR) -e $(ENTRYADDR) -r $${RFSOFFSET} \
 			-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)" "$(SERIALNO)" "$(EXTENDNO)" "0" "0" "0" "0" "0" "0" \
-			-d image/$(IMGNAME).img image/$(IMGNAME).trx
+			-d image/$(IMGNAME).img image/$(NEW_IMGNAME).trx
 else
 	@if [ -n "$(DTB)" -a ! -e $(LINUXDIR)/arch/$(ARCH)/boot/dts/$(DTB) ] ; then \
 		echo "$(LINUXDIR)/arch/$(ARCH)/boot/dts/$(DTB) not found!!!" ; \
@@ -1044,7 +1046,7 @@ endif
 	
 	#@asustools/mkimage -A mips -O linux -d $(RSDKDIR)/image/fw.bin image/$(IMGNAME).trx
 endif
-	md5sum image/$(IMGNAME).trx > image/$(IMGNAME).md5
+	md5sum image/$(NEW_IMGNAME).trx > image/$(NEW_IMGNAME).md5
 
 ifeq ($(DSL_REMOTE),y)
 	$(call dsl_genbintrx_epilog)
@@ -1093,7 +1095,7 @@ ifneq (,$(wildcard $(SRC_ROOT)/../../buildtools/private.pem))
 endif
 endif
 endif
-	ln -sf $(IMGNAME).trx image/$(BUILD_NAME).trx
+	ln -sf $(NEW_IMGNAME).trx image/$(REAL_NAME).trx
 ifeq ($(ARM),y)
 	ln -sf $(LINUXDIR)/vmlinux image/vmlinux
 	ln -sf $(LINUXDIR)/vmlinux.o image/vmlinux.o
