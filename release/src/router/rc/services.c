@@ -12392,108 +12392,174 @@ again:
 #else /* !RTCONFIG_REALTEK */
 #if defined(RTCONFIG_QCA) && defined(RTCONFIG_FITFDT)
 					{
-						// char header_size[20];
-						// snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
-						// eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
+						//char header_size[20];
+						//snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
+						//eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
 
-    // 已知 header_size = 64 字节
-    int header_size = 64;
-    int part1_size = 3999832;  // kernel 部分大小
-    int trailer_size = 24;     // 包尾24字节
-    
-    char cmd[512];
-    
-    // 获取整个升级文件的大小
-    struct stat st;
-    stat(upgrade_file, &st);
-    int total_size = st.st_size;
-    
-    // 计算rootfs大小：总大小 - 头部64字节 - 内核3999832字节 - 包尾24字节
-    int rootfs_size = total_size - header_size - part1_size - trailer_size;
-    
-    printf("File size analysis:\n");
-    printf("Total size: %d bytes\n", total_size);
-    printf("Header: %d bytes\n", header_size);
-    printf("Kernel: %d bytes\n", part1_size);
-    printf("Rootfs: %d bytes\n", rootfs_size);
-    printf("Trailer: %d bytes\n", trailer_size);
-    
-    // 使用tail和head提取kernel部分
-    // tail -c +65 跳过前64字节，head -c 3999832 取3999832字节
-    printf("Extracting kernel.bin...\n");
-    snprintf(cmd, sizeof(cmd), "tail -c +65 %s | head -c %d > /tmp/kernel.bin", 
-             upgrade_file, part1_size);
-    printf("Executing: %s\n", cmd);
-    system(cmd);
-    
-    // 检查kernel文件大小
-    system("ls -la /tmp/kernel.bin | awk '{print $5, $9}'");
-    
-    // 使用tail和head提取rootfs部分
-    // tail -c +3999897 跳过前64+3999832=3999896字节，取rootfs_size字节
-    printf("Extracting rootfs.bin...\n");
-    int rootfs_start = header_size + part1_size + 1;  // tail -c +N 是从第N字节开始
-    snprintf(cmd, sizeof(cmd), "tail -c +%d %s | head -c %d > /tmp/rootfs.bin", 
-             rootfs_start, upgrade_file, rootfs_size);
-    printf("Executing: %s\n", cmd);
-    system(cmd);
-    
-    // 检查rootfs文件大小
-    system("ls -la /tmp/rootfs.bin | awk '{print $5, $9}'");
-    
-    // 获取rootfs实际字节数并计算块数
-    printf("Calculating rootfs blocks for EMMC writing...\n");
-    FILE *fp = popen("ls -l /tmp/rootfs.bin | awk '{print $5}'", "r");
-    int rootfs_bytes = 0;
-    if (fp) {
-        char size_str[20];
-        if (fgets(size_str, sizeof(size_str), fp)) {
-            rootfs_bytes = atoi(size_str);
-        }
-        pclose(fp);
-    }
-    
-    // 计算512字节块数并进行128块对齐（64KiB对齐）
-    int rootfs_blocks = (rootfs_bytes + 511) / 512;
-    int aligned_rootfs_blocks = ((rootfs_blocks + 127) & ~127);
-    
-    printf("Rootfs bytes: %d, blocks: %d, aligned blocks: %d\n", 
-           rootfs_bytes, rootfs_blocks, aligned_rootfs_blocks);
-    
-    // 刷入分区 - 使用512字节块操作
-    printf("Flashing to EMMC partitions with 512-byte blocks...\n");
-    
-    // 刷入kernel分区
-    system("dd if=/tmp/kernel.bin of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null");
-    printf("Kernel flashed to /dev/mmcblk0p17\n");
-    
-    // 刷入rootfs分区
-    snprintf(cmd, sizeof(cmd), "dd if=/tmp/rootfs.bin of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
-             rootfs_blocks);
-    system(cmd);
-    printf("Rootfs data flashed to /dev/mmcblk0p18 (%d blocks)\n", rootfs_blocks);
-    
-    // 对齐填充
-    if (aligned_rootfs_blocks > rootfs_blocks) {
-        int fill_blocks = aligned_rootfs_blocks - rootfs_blocks;
-        printf("Filling %d blocks with zeros for 64KiB alignment...\n", fill_blocks);
-        
-        snprintf(cmd, sizeof(cmd), "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
-                 rootfs_blocks, fill_blocks);
-        system(cmd);
-        printf("Alignment padding completed\n");
-    }
-    
-    // 同步文件系统
-    system("sync");
-    
-    // 清理临时文件
-    printf("Cleaning up temporary files...\n");
-    system("rm -f /tmp/kernel.bin /tmp/rootfs.bin");
-    
-    printf("EMMC upgrade completed successfully!\n");
-    printf("Rootfs aligned to %d blocks (%d KiB)\n", 
-           aligned_rootfs_blocks, aligned_rootfs_blocks * 512 / 1024);
+						char cmd[512];
+						
+						// 已知的头部和尾部信息
+						int header_size = 64;      // 头部64字节
+						int trailer_size = 24;     // 尾部24字节
+						
+						printf("Processing packaged upgrade file...\n");
+						printf("Header: %d bytes, Trailer: %d bytes\n", header_size, trailer_size);
+						
+						// 获取升级文件的总大小
+						struct stat st;
+						if (stat(upgrade_file, &st) != 0) {
+							printf("Error: Cannot access upgrade file\n");
+							return;
+						}
+						int total_size = st.st_size;
+						printf("Total file size: %d bytes\n", total_size);
+						
+						// 计算tar包的实际大小：总大小 - 头部 - 尾部
+						int tar_size = total_size - header_size - trailer_size;
+						printf("Tar archive size: %d bytes\n", tar_size);
+						
+						// 创建临时目录用于解压
+						printf("Creating temporary directory for extraction...\n");
+						system("rm -rf /tmp/upgrade_extract");
+						system("mkdir -p /tmp/upgrade_extract");
+						
+						// 使用tail和head方式提取tar包并解压（更可靠的方法）
+						printf("Extracting and unpacking tar archive using tail+head...\n");
+						snprintf(cmd, sizeof(cmd), "tail -c +%d %s | head -c %d | tar -xC /tmp/upgrade_extract", 
+								 header_size + 1, upgrade_file, tar_size);
+						printf("Executing: %s\n", cmd);
+						int ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to extract and unpack tar archive (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						// 检查提取的文件和目录结构
+						printf("Checking extracted files structure...\n");
+						system("find /tmp/upgrade_extract -name '*.bin' | grep -v '/$'");
+						
+						// 查找kernel.bin和rootfs.bin文件
+						char kernel_path[256] = "/tmp/upgrade_extract/kernel.bin";
+						char rootfs_path[256] = "/tmp/upgrade_extract/rootfs.bin";
+						
+						// 如果直接找不到，尝试在image目录中查找
+						if (access(kernel_path, F_OK) != 0) {
+							printf("kernel.bin not found in root, checking image directory...\n");
+							snprintf(kernel_path, sizeof(kernel_path), "/tmp/upgrade_extract/image/kernel.bin");
+							snprintf(rootfs_path, sizeof(rootfs_path), "/tmp/upgrade_extract/image/rootfs.bin");
+						}
+						
+						// 再次检查文件是否存在
+						if (access(kernel_path, F_OK) != 0) {
+							printf("Error: kernel.bin not found in any expected location\n");
+							printf("Available files in /tmp/upgrade_extract:\n");
+							system("find /tmp/upgrade_extract -type f");
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						printf("Found kernel.bin at: %s\n", kernel_path);
+						printf("Found rootfs.bin at: %s\n", rootfs_path);
+						
+						// 刷入kernel.bin到mmcblk0p17
+						printf("Flashing kernel.bin to /dev/mmcblk0p17...\n");
+						
+						// 获取kernel.bin的大小
+						if (stat(kernel_path, &st) != 0) {
+							printf("Error: Cannot access kernel.bin at %s\n", kernel_path);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						int kernel_size = st.st_size;
+						int kernel_blocks = (kernel_size + 511) / 512;
+						printf("Kernel size: %d bytes, %d blocks\n", kernel_size, kernel_blocks);
+						
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null", kernel_path);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash kernel (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Kernel flashed to /dev/mmcblk0p17 (%d blocks)\n", kernel_blocks);
+						
+						// 刷入rootfs.bin到mmcblk0p18
+						printf("Flashing rootfs.bin to /dev/mmcblk0p18...\n");
+						
+						// 获取rootfs.bin的大小
+						if (stat(rootfs_path, &st) != 0) {
+							printf("Error: rootfs.bin not found or cannot access at %s\n", rootfs_path);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						int rootfs_size = st.st_size;
+						int rootfs_blocks = (rootfs_size + 511) / 512;
+						printf("Rootfs size: %d bytes, %d blocks\n", rootfs_size, rootfs_blocks);
+						
+						// 使用默认目标分区大小60MB (122880块)
+						int target_partition_blocks = 122880;
+						printf("Target partition size: %d blocks (60MB)\n", target_partition_blocks);
+						
+						// 限制rootfs块数不超过目标分区大小
+						if (rootfs_blocks > target_partition_blocks) {
+							rootfs_blocks = target_partition_blocks;
+							printf("Limiting rootfs to %d blocks (target partition size)\n", rootfs_blocks);
+						}
+						
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
+								 rootfs_path, rootfs_blocks);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash rootfs (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Rootfs flashed to /dev/mmcblk0p18 (%d blocks)\n", rootfs_blocks);
+						
+						// 如果目标分区比写入的数据大，用零填充剩余空间
+						if (rootfs_blocks < target_partition_blocks) {
+							int fill_blocks = target_partition_blocks - rootfs_blocks;
+							printf("Filling remaining %d blocks with zeros...\n", fill_blocks);
+							
+							snprintf(cmd, sizeof(cmd), 
+									 "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
+									 rootfs_blocks, fill_blocks);
+							ret = system(cmd);
+							if (ret != 0) {
+								printf("Error: dd zero-fill command failed with return code %d\n", ret);
+								system("rm -rf /tmp/upgrade_extract");
+								return;
+							}
+							printf("Padding completed\n");
+						}
+						
+						// 验证刷写结果
+						printf("Verifying flash operation...\n");
+						
+						// 检查kernel分区
+						printf("Kernel partition (/dev/mmcblk0p17):\n");
+						system("dd if=/dev/mmcblk0p17 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						// 检查rootfs分区
+						printf("Rootfs partition (/dev/mmcblk0p18):\n");
+						system("dd if=/dev/mmcblk0p18 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						// 同步文件系统
+						system("sync");
+						
+						// 清理临时文件
+						system("rm -rf /tmp/upgrade_extract");
+						
+						printf("EMMC upgrade completed successfully!\n");
+						printf("Kernel: %d blocks in /dev/mmcblk0p17\n", kernel_blocks);
+						printf("Rootfs: %d blocks in /dev/mmcblk0p18\n", rootfs_blocks);
 
 					}
 #else
@@ -12786,108 +12852,174 @@ again:
 #else /* !RTCONFIG_REALTEK */
 #if defined(RTCONFIG_QCA) && defined(RTCONFIG_FITFDT)
 					{
-						// char header_size[20];
-						// snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
-						// eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
+						//char header_size[20];
+						//snprintf(header_size, sizeof(header_size)-1, "%d", get_imageheader_size());
+						//eval("mtd-write", "-i", upgrade_file, "-d", "linux", "-s", header_size);
 
-    // 已知 header_size = 64 字节
-    int header_size = 64;
-    int part1_size = 3999832;  // kernel 部分大小
-    int trailer_size = 24;     // 包尾24字节
-    
-    char cmd[512];
-    
-    // 获取整个升级文件的大小
-    struct stat st;
-    stat(upgrade_file, &st);
-    int total_size = st.st_size;
-    
-    // 计算rootfs大小：总大小 - 头部64字节 - 内核3999832字节 - 包尾24字节
-    int rootfs_size = total_size - header_size - part1_size - trailer_size;
-    
-    printf("File size analysis:\n");
-    printf("Total size: %d bytes\n", total_size);
-    printf("Header: %d bytes\n", header_size);
-    printf("Kernel: %d bytes\n", part1_size);
-    printf("Rootfs: %d bytes\n", rootfs_size);
-    printf("Trailer: %d bytes\n", trailer_size);
-    
-    // 使用tail和head提取kernel部分
-    // tail -c +65 跳过前64字节，head -c 3999832 取3999832字节
-    printf("Extracting kernel.bin...\n");
-    snprintf(cmd, sizeof(cmd), "tail -c +65 %s | head -c %d > /tmp/kernel.bin", 
-             upgrade_file, part1_size);
-    printf("Executing: %s\n", cmd);
-    system(cmd);
-    
-    // 检查kernel文件大小
-    system("ls -la /tmp/kernel.bin | awk '{print $5, $9}'");
-    
-    // 使用tail和head提取rootfs部分
-    // tail -c +3999897 跳过前64+3999832=3999896字节，取rootfs_size字节
-    printf("Extracting rootfs.bin...\n");
-    int rootfs_start = header_size + part1_size + 1;  // tail -c +N 是从第N字节开始
-    snprintf(cmd, sizeof(cmd), "tail -c +%d %s | head -c %d > /tmp/rootfs.bin", 
-             rootfs_start, upgrade_file, rootfs_size);
-    printf("Executing: %s\n", cmd);
-    system(cmd);
-    
-    // 检查rootfs文件大小
-    system("ls -la /tmp/rootfs.bin | awk '{print $5, $9}'");
-    
-    // 获取rootfs实际字节数并计算块数
-    printf("Calculating rootfs blocks for EMMC writing...\n");
-    FILE *fp = popen("ls -l /tmp/rootfs.bin | awk '{print $5}'", "r");
-    int rootfs_bytes = 0;
-    if (fp) {
-        char size_str[20];
-        if (fgets(size_str, sizeof(size_str), fp)) {
-            rootfs_bytes = atoi(size_str);
-        }
-        pclose(fp);
-    }
-    
-    // 计算512字节块数并进行128块对齐（64KiB对齐）
-    int rootfs_blocks = (rootfs_bytes + 511) / 512;
-    int aligned_rootfs_blocks = ((rootfs_blocks + 127) & ~127);
-    
-    printf("Rootfs bytes: %d, blocks: %d, aligned blocks: %d\n", 
-           rootfs_bytes, rootfs_blocks, aligned_rootfs_blocks);
-    
-    // 刷入分区 - 使用512字节块操作
-    printf("Flashing to EMMC partitions with 512-byte blocks...\n");
-    
-    // 刷入kernel分区
-    system("dd if=/tmp/kernel.bin of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null");
-    printf("Kernel flashed to /dev/mmcblk0p17\n");
-    
-    // 刷入rootfs分区
-    snprintf(cmd, sizeof(cmd), "dd if=/tmp/rootfs.bin of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
-             rootfs_blocks);
-    system(cmd);
-    printf("Rootfs data flashed to /dev/mmcblk0p18 (%d blocks)\n", rootfs_blocks);
-    
-    // 对齐填充
-    if (aligned_rootfs_blocks > rootfs_blocks) {
-        int fill_blocks = aligned_rootfs_blocks - rootfs_blocks;
-        printf("Filling %d blocks with zeros for 64KiB alignment...\n", fill_blocks);
-        
-        snprintf(cmd, sizeof(cmd), "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
-                 rootfs_blocks, fill_blocks);
-        system(cmd);
-        printf("Alignment padding completed\n");
-    }
-    
-    // 同步文件系统
-    system("sync");
-    
-    // 清理临时文件
-    printf("Cleaning up temporary files...\n");
-    system("rm -f /tmp/kernel.bin /tmp/rootfs.bin");
-    
-    printf("EMMC upgrade completed successfully!\n");
-    printf("Rootfs aligned to %d blocks (%d KiB)\n", 
-           aligned_rootfs_blocks, aligned_rootfs_blocks * 512 / 1024);
+						char cmd[512];
+						
+						// 已知的头部和尾部信息
+						int header_size = 64;      // 头部64字节
+						int trailer_size = 24;     // 尾部24字节
+						
+						printf("Processing packaged upgrade file...\n");
+						printf("Header: %d bytes, Trailer: %d bytes\n", header_size, trailer_size);
+						
+						// 获取升级文件的总大小
+						struct stat st;
+						if (stat(upgrade_file, &st) != 0) {
+							printf("Error: Cannot access upgrade file\n");
+							return;
+						}
+						int total_size = st.st_size;
+						printf("Total file size: %d bytes\n", total_size);
+						
+						// 计算tar包的实际大小：总大小 - 头部 - 尾部
+						int tar_size = total_size - header_size - trailer_size;
+						printf("Tar archive size: %d bytes\n", tar_size);
+						
+						// 创建临时目录用于解压
+						printf("Creating temporary directory for extraction...\n");
+						system("rm -rf /tmp/upgrade_extract");
+						system("mkdir -p /tmp/upgrade_extract");
+						
+						// 使用tail和head方式提取tar包并解压（更可靠的方法）
+						printf("Extracting and unpacking tar archive using tail+head...\n");
+						snprintf(cmd, sizeof(cmd), "tail -c +%d %s | head -c %d | tar -xC /tmp/upgrade_extract", 
+								 header_size + 1, upgrade_file, tar_size);
+						printf("Executing: %s\n", cmd);
+						int ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to extract and unpack tar archive (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						// 检查提取的文件和目录结构
+						printf("Checking extracted files structure...\n");
+						system("find /tmp/upgrade_extract -name '*.bin' | grep -v '/$'");
+						
+						// 查找kernel.bin和rootfs.bin文件
+						char kernel_path[256] = "/tmp/upgrade_extract/kernel.bin";
+						char rootfs_path[256] = "/tmp/upgrade_extract/rootfs.bin";
+						
+						// 如果直接找不到，尝试在image目录中查找
+						if (access(kernel_path, F_OK) != 0) {
+							printf("kernel.bin not found in root, checking image directory...\n");
+							snprintf(kernel_path, sizeof(kernel_path), "/tmp/upgrade_extract/image/kernel.bin");
+							snprintf(rootfs_path, sizeof(rootfs_path), "/tmp/upgrade_extract/image/rootfs.bin");
+						}
+						
+						// 再次检查文件是否存在
+						if (access(kernel_path, F_OK) != 0) {
+							printf("Error: kernel.bin not found in any expected location\n");
+							printf("Available files in /tmp/upgrade_extract:\n");
+							system("find /tmp/upgrade_extract -type f");
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						printf("Found kernel.bin at: %s\n", kernel_path);
+						printf("Found rootfs.bin at: %s\n", rootfs_path);
+						
+						// 刷入kernel.bin到mmcblk0p17
+						printf("Flashing kernel.bin to /dev/mmcblk0p17...\n");
+						
+						// 获取kernel.bin的大小
+						if (stat(kernel_path, &st) != 0) {
+							printf("Error: Cannot access kernel.bin at %s\n", kernel_path);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						int kernel_size = st.st_size;
+						int kernel_blocks = (kernel_size + 511) / 512;
+						printf("Kernel size: %d bytes, %d blocks\n", kernel_size, kernel_blocks);
+						
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null", kernel_path);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash kernel (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Kernel flashed to /dev/mmcblk0p17 (%d blocks)\n", kernel_blocks);
+						
+						// 刷入rootfs.bin到mmcblk0p18
+						printf("Flashing rootfs.bin to /dev/mmcblk0p18...\n");
+						
+						// 获取rootfs.bin的大小
+						if (stat(rootfs_path, &st) != 0) {
+							printf("Error: rootfs.bin not found or cannot access at %s\n", rootfs_path);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						
+						int rootfs_size = st.st_size;
+						int rootfs_blocks = (rootfs_size + 511) / 512;
+						printf("Rootfs size: %d bytes, %d blocks\n", rootfs_size, rootfs_blocks);
+						
+						// 使用默认目标分区大小60MB (122880块)
+						int target_partition_blocks = 122880;
+						printf("Target partition size: %d blocks (60MB)\n", target_partition_blocks);
+						
+						// 限制rootfs块数不超过目标分区大小
+						if (rootfs_blocks > target_partition_blocks) {
+							rootfs_blocks = target_partition_blocks;
+							printf("Limiting rootfs to %d blocks (target partition size)\n", rootfs_blocks);
+						}
+						
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
+								 rootfs_path, rootfs_blocks);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash rootfs (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Rootfs flashed to /dev/mmcblk0p18 (%d blocks)\n", rootfs_blocks);
+						
+						// 如果目标分区比写入的数据大，用零填充剩余空间
+						if (rootfs_blocks < target_partition_blocks) {
+							int fill_blocks = target_partition_blocks - rootfs_blocks;
+							printf("Filling remaining %d blocks with zeros...\n", fill_blocks);
+							
+							snprintf(cmd, sizeof(cmd), 
+									 "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
+									 rootfs_blocks, fill_blocks);
+							ret = system(cmd);
+							if (ret != 0) {
+								printf("Error: dd zero-fill command failed with return code %d\n", ret);
+								system("rm -rf /tmp/upgrade_extract");
+								return;
+							}
+							printf("Padding completed\n");
+						}
+						
+						// 验证刷写结果
+						printf("Verifying flash operation...\n");
+						
+						// 检查kernel分区
+						printf("Kernel partition (/dev/mmcblk0p17):\n");
+						system("dd if=/dev/mmcblk0p17 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						// 检查rootfs分区
+						printf("Rootfs partition (/dev/mmcblk0p18):\n");
+						system("dd if=/dev/mmcblk0p18 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						// 同步文件系统
+						system("sync");
+						
+						// 清理临时文件
+						system("rm -rf /tmp/upgrade_extract");
+						
+						printf("EMMC upgrade completed successfully!\n");
+						printf("Kernel: %d blocks in /dev/mmcblk0p17\n", kernel_blocks);
+						printf("Rootfs: %d blocks in /dev/mmcblk0p18\n", rootfs_blocks);
 
 					}
 #else
