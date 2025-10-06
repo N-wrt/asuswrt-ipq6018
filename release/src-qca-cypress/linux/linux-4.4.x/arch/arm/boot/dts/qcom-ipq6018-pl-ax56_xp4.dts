@@ -181,10 +181,6 @@
                 phy-mode = "sgmii";
         };
 
-	leds {
-	        status = "disabled";
-	};
-
 	serial@78b0000 {
 	        status = "disabled";
 	};
