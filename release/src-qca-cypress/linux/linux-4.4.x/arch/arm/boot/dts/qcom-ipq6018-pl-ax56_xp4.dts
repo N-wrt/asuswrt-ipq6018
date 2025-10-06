@@ -213,29 +213,41 @@
 		switch_mac_mode2 = <0xff>; /* mac mode for uniphy instance2*/
 		qcom,port_phyinfo {
                         port@0 {
+                                port_id = <5>;
+                                phy_address = <4>;
+                        };
+                        port@1 {
                                 port_id = <1>;
                                 phy_address = <0>;
                         };
-                        port@1 {
+                        port@2 {
                                 port_id = <2>;
                                 phy_address = <1>;
                         };
-                        port@2 {
-                                port_id = <3>;
-                                phy_address = <2>;
-                        };
 			port@3 {
-				port_id = <4>;
-				phy_address = <3>;
+				port_id = <3>;
+				phy_address = <2>;
 			};
 			port@4 {
-				port_id = <5>;
-				phy_address = <4>;
+				port_id = <4>;
+				phy_address = <3>;
 			};
 		};
 	};
 
 	dp1 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <5>;
+		reg = <0x3a001800 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <4>;
+		phy-mode = "sgmii";
+	};
+
+	dp2 {
 		device_type = "network";
 		compatible = "qcom,nss-dp";
 		qcom,id = <1>;
@@ -247,19 +259,19 @@
 		phy-mode = "sgmii";
 	};
 
-	dp2 {
-		device_type = "network";
-		compatible = "qcom,nss-dp";
-		qcom,id = <2>;
-		reg = <0x3a001200 0x200>;
-		qcom,mactype = <0>;
-		local-mac-address = [000000000000];
-		qcom,link-poll = <1>;
-		qcom,phy-mdio-addr = <1>;
-		phy-mode = "sgmii";
-	};
-
         dp3 {
+                device_type = "network";
+                compatible = "qcom,nss-dp";
+                qcom,id = <2>;
+                reg = <0x3a001200 0x200>;
+                qcom,mactype = <0>;
+                local-mac-address = [000000000000];
+                qcom,link-poll = <1>;
+                qcom,phy-mdio-addr = <1>;
+                phy-mode = "sgmii";
+        };
+
+        dp4 {
                 device_type = "network";
                 compatible = "qcom,nss-dp";
                 qcom,id = <3>;
@@ -271,7 +283,7 @@
                 phy-mode = "sgmii";
         };
 
-        dp4 {
+        dp5 {
                 device_type = "network";
                 compatible = "qcom,nss-dp";
                 qcom,id = <4>;
@@ -280,18 +292,6 @@
                 local-mac-address = [000000000000];
                 qcom,link-poll = <1>;
                 qcom,phy-mdio-addr = <3>;
-                phy-mode = "sgmii";
-        };
-
-        dp5 {
-                device_type = "network";
-                compatible = "qcom,nss-dp";
-                qcom,id = <5>;
-                reg = <0x3a001800 0x200>;
-                qcom,mactype = <0>;
-                local-mac-address = [000000000000];
-                qcom,link-poll = <1>;
-                qcom,phy-mdio-addr = <4>;
                 phy-mode = "sgmii";
         };
 
