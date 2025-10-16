@@ -246,7 +246,7 @@ struct packet_skb_cb {
 static void __fanout_unlink(struct sock *sk, struct packet_sock *po);
 static void __fanout_link(struct sock *sk, struct packet_sock *po);
 
-#if defined(CONFIG_PLAX56XP4) || defined(CONFIG_RT360V6) ||defined(CONFIG_RTAX18) ||defined(CONFIG_RTAX5) ||defined(CONFIG_RTW212X) ||defined(CONFIG_RTMANGO)
+#if defined(CONFIG_PLAX56XP4)
 static struct sock *plc_sock=NULL;
 #endif
 static int packet_direct_xmit(struct sk_buff *skb)
@@ -2794,7 +2794,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
 		goto out_free;
 	}
 
-#if defined(CONFIG_PLAX56XP4) || defined(CONFIG_RT360V6) ||defined(CONFIG_RTAX18) ||defined(CONFIG_RTAX5) ||defined(CONFIG_RTW212X) ||defined(CONFIG_RTMANGO)
+#if defined(CONFIG_PLAX56XP4)
 	if (plc_sock == sk && sock->type == SOCK_RAW) {
 		skb->data[6] |= 0x2; // enable source MAC local administer bit
 	}
@@ -2929,7 +2929,7 @@ static int packet_release(struct socket *sock)
 	packet_free_pending(po);
 	sk_refcnt_debug_release(sk);
 
-#if defined(CONFIG_PLAX56XP4) || defined(CONFIG_RT360V6) ||defined(CONFIG_RTAX18) ||defined(CONFIG_RTAX5) ||defined(CONFIG_RTW212X) ||defined(CONFIG_RTMANGO)
+#if defined(CONFIG_PLAX56XP4)
 	if (sk == plc_sock) {
 		plc_sock = NULL;
 	}
@@ -2977,7 +2977,7 @@ static int packet_do_bind(struct sock *sk, const char *name, int ifindex,
 	if (dev)
 		dev_hold(dev);
 
-#if defined(CONFIG_PLAX56XP4) || defined(CONFIG_RT360V6) ||defined(CONFIG_RTAX18) ||defined(CONFIG_RTAX5) ||defined(CONFIG_RTW212X) ||defined(CONFIG_RTMANGO)
+#if defined(CONFIG_PLAX56XP4)
 	if (!strcmp(dev->name, "eth1") && !strcmp(current->comm, "lldpd")) {
 		plc_sock = sk;
 	}

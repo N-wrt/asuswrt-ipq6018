@@ -1130,7 +1130,7 @@ enum led_id {
 	LED_BLUE,
 	LED_GREEN,
 	LED_RED,
-#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4)
 	LED_WHITE,
 #endif
 #endif
@@ -3135,7 +3135,7 @@ extern void set_wifiled(int mode);
 #define RGBLED_BLUE			RGBLED_BLED
 #define RGBLED_GREEN			RGBLED_GLED
 #define RGBLED_RED			RGBLED_RLED
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#if defined(PLAX56_XP4)
 #define RGBLED_WHITE			RGBLED_COLOR_MESK
 #else
 #define RGBLED_WHITE			(RGBLED_BLED | RGBLED_GLED | RGBLED_RLED)
@@ -3174,7 +3174,7 @@ extern void set_wifiled(int mode);
 #define RGBLED_AP_MODE_CONNECTED	RGBLED_YELLOW		/* unnecessary */
 #define RGBLED_ETH_BACKHAUL		RGBLED_GREEN
 #define RGBLED_WEAK_BACKHAUL		RGBLED_YELLOW		/* unnecessary */
-#elif defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO) || defined(ETJ)
+#elif defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(ETJ)
 #define RGBLED_BOOTING			RGBLED_GREEN_3ON3OFF
 #define RGBLED_DEFAULT_STANDBY		RGBLED_BLUE
 #define RGBLED_APPLY_EVENT		RGBLED_BOOTING

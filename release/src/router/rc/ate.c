@@ -944,7 +944,7 @@ static int setAllSpecificColorLedOn(enum ate_led_color color)
 				LED_RED,
 				LED_ID_MAX
 			};
-#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) ||defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
+#if defined(RTAC59_CD6R) || defined(RTAC59_CD6N) || defined(PLAX56_XP4)
 			static enum led_id white_led[] = {
 				LED_WHITE,
 				LED_ID_MAX
@@ -3747,12 +3747,10 @@ int ate_dev_status(void)
 		int retry;
 #if defined(RTAX56_XD4) || defined(PLAX56_XP4)
 		if(nvram_match("HwId", "A") || nvram_match("HwId", "C")){
-			have_bt_device = 1;
+			have_bt_device = 0;
 		}else{
 			have_bt_device = 0;
 		}
-#elif defined(RT360V6) || defined(RTAX18) || defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-			have_bt_device = 0;
 #endif
 #if defined(RTAX56_XD4)
 		if((nvram_match("HwId", "A") && nvram_get_int("BLE_BT") == 99) ||

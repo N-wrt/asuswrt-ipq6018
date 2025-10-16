@@ -69,19 +69,7 @@ static const struct model_s model_list[] = {
 	{ "PL-N12",		MODEL_PLN12		},
 	{ "PL-AC56",		MODEL_PLAC56		},
 	{ "PL-AC66U",		MODEL_PLAC66U		},
-#if defined(RT360V6)
-	{ "RT-360V6",	    MODEL_RT360V6		},
-#elif defined(RTAX18)
-	{ "RT-AX18",	    MODEL_RTAX18		},
-#elif defined(RTAX5)
-	{ "RT-AX5",	        MODEL_RTAX5		},
-#elif defined(RTW212X)
-        { "RT-W212X",	    MODEL_RTW212X		},
-#elif defined(RTMANGO)
-	{ "RT-MANGO",	    MODEL_RTMANGO		},
-#else
 	{ "PL-AX56_XP4",	MODEL_PLAX56XP4		},
-#endif
 	{ "RP-AC66",		MODEL_RPAC66		},
 	{ "RP-AC51",		MODEL_RPAC51		},
 	{ "RT-AC58U",		MODEL_RTAC58U		},

@@ -3889,7 +3889,7 @@ void init_syspara(void)
 	getPLC_MAC(macaddr);
 	nvram_set("plc_macaddr", macaddr);
 #elif defined(RTCONFIG_QCA_PLC2)
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) || defined(RTAX5) || defined(RTW212X) ||defined(RTMANGO)
+#if defined(PLAX56_XP4)
 	strcpy(macaddr2, nvram_get("wl1macaddr"));
 	if(ether_atoe(macaddr2, buffer)) {
 		buffer[5] += 2;		/* PLC MAC = 5G MAC + 2 */

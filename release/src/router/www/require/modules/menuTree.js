@@ -205,6 +205,7 @@ define(function(){
 					{url: "Advanced_GWStaticRoute_Content.asp", tabName: "<#menu5_2_3#>"},
 					{url: "Advanced_IPTV_Content.asp", tabName: "IPTV"},
 					{url: "Advanced_SwitchCtrl_Content.asp", tabName: "<#Switch_itemname#>"},
+					{url: "Advanced_SmartDNS_Content.asp", tabName: "SmartDNS"},
 					{url: "NULL", tabName: "__INHERIT__"}
 				] 
 			},
@@ -475,6 +476,7 @@ define(function(){
 						retArray.push("menu_Alexa_IFTTT");
 					}
 				}
+
 				if (!softcenter_support || '<% nvram_get("sc_installed"); %>' != '1'){
 					retArray.push("menu_Softcenter");
 				}

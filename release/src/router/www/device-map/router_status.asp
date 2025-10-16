@@ -477,7 +477,7 @@ function get_ethernet_ports() {
 }
 
 function get_plc_ports() {
-	if(based_modelid == "PL-AX56_XP4"){
+	if(0){
 		var code = '<div class="division-block"><#Powerline#></div>';
 		code += '<div>';
 		code += '<div class="display-flex flex-a-center table-header">';

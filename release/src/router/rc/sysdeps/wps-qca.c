@@ -139,8 +139,8 @@ int is_wps_stopped(void)
 #endif
 
 #ifdef RTCONFIG_QCA_PLC2
-	if (nvram_invmatch("wlready", "1"))
-		return 1;	// wifi not ready = stop
+	//if (nvram_invmatch("wlready", "1"))
+	//	return 1;	// wifi not ready = stop
 #endif
 
 	i = 0;
@@ -155,10 +155,10 @@ int is_wps_stopped(void)
 		SKIP_ABSENT_BAND_AND_INC_UNIT(i);
 		snprintf(prefix, sizeof(prefix), "wl%d_", i);
 #ifdef RTCONFIG_QCA_PLC2
-		if (get_radio_status(word) == 0) {
-			++i;
-			continue;
-		}
+		//if (get_radio_status(word) == 0) {
+		//	++i;
+		//	continue;
+		//}
 #else
 		if (!__need_to_start_wps_band(prefix) || nvram_match(strcat_r(prefix, "radio", tmp), "0")) {
 			ret = 0;

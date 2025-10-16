@@ -2513,7 +2513,14 @@ config RTCONFIG_SOFTCENTER
 	bool "softcenter"
 	default n
 
+config RTCONFIG_SMARTDNS
+	bool "smart dns"
+	default n
+
 config RTCONFIG_SWRT
 	bool "RTCONFIG_SWRT"
 	default n
 
+config RTCONFIG_SWRT_UU
+	bool "RTCONFIG_SWRT_UU"
+	default n

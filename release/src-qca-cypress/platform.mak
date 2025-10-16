@@ -164,7 +164,7 @@ define platformRouterOptions
 			sed -i "/RTCONFIG_MUSL_LIBC/d" $(1); \
 			echo "RTCONFIG_MUSL_LIBC=y" >>$(1); \
 		fi; \
-		if [ "$(BUILD_NAME)" = "PL-AX56_XP4" ]||[ "$(BUILD_NAME)" = "RT-360V6" ]||[ "$(BUILD_NAME)" = "RT-AX18" ]||[ "$(BUILD_NAME)" = "RT-AX5" ]||[ "$(BUILD_NAME)" = "RT-W212X" ]||[ "$(BUILD_NAME)" = "RT-MANGO" ]; then \
+		if [ "$(BUILD_NAME)" = "PL-AX56_XP4" ]; then \
 			sed -i "/RTCONFIG_FIXED_BRIGHTNESS_RGBLED\>/d" $(1); \
 			echo "RTCONFIG_FIXED_BRIGHTNESS_RGBLED=y" >>$(1); \
 		fi; \
@@ -285,7 +285,7 @@ define platformKernelConfig
 			echo "# CONFIG_BT_MRVL is not set" >>$(1); \
 			echo "# CONFIG_BTRFS_FS is not set" >>$(1); \
 		fi; \
-		if [ "$(BUILD_NAME)" = "PL-AX56_XP4" ]||[ "$(BUILD_NAME)" = "RT-360V6" ]||[ "$(BUILD_NAME)" = "RT-AX18" ]||[ "$(BUILD_NAME)" = "RT-AX5" ]||[ "$(BUILD_NAME)" = "RT-W212X" ]||[ "$(BUILD_NAME)" = "RT-MANGO" ]; then \
+		if [ "$(BUILD_NAME)" = "PL-AX56_XP4" ]; then \
 			sed -i "/CONFIG_IPQ_MEM_PROFILE/d" $(1); \
 			echo "CONFIG_IPQ_MEM_PROFILE=512" >>$(1); \
 		fi; \

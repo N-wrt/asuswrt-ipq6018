@@ -1549,8 +1549,8 @@ void write_port_forwarding(FILE *fp, char *config, char *lan_ip, char *lan_if)
 		}
 	}
 #endif	/* RTCONFIG_MULTIWAN_CFG */
-#if defined(RTAX56_XD4) || defined(XD4PRO) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) ||defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) ||defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
+#if defined(RTAX56_XD4) || defined(XD4PRO) || defined(RTAC59_CD6N) || defined(PLAX56_XP4)
+#if defined(PLAX56_XP4)
 	if(nvram_match("HwId", "B") || nvram_match("HwId", "D"))
 #endif // XP4
 	write_extra_port_forwarding(fp, lan_ip);
@@ -2575,8 +2575,8 @@ void redirect_setting(void)
 	}
 #endif
 
-#if defined(RTAX56_XD4) || defined(XD4PRO) || defined(RTAC59_CD6N) || defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) ||defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
-#if defined(PLAX56_XP4) || defined(RT360V6) || defined(RTAX18) ||defined(RTAX5) ||defined(RTW212X) ||defined(RTMANGO)
+#if defined(RTAX56_XD4) || defined(XD4PRO) || defined(RTAC59_CD6N) || defined(PLAX56_XP4)
+#if defined(PLAX56_XP4)
 	if(nvram_match("HwId", "B") || nvram_match("HwId", "D"))
 #endif // XP4
 	write_extra_port_forwarding(redirect_fp, lan_ipaddr_t);

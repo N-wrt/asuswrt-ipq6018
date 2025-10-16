@@ -1106,7 +1106,7 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
 	ptr[17] = 0x00;
 #if defined(CONFIG_RTAC95U) /*AMAS*/
 	ptr[14] |= 0x84;
-#elif defined(CONFIG_PLAX56XP4) ||defined(CONFIG_RT360V6) ||defined(CONFIG_RTAX18) ||defined(CONFIG_RTAX5) ||defined(CONFIG_RTW212X) ||defined(CONFIG_RTMANGO)
+#elif defined(CONFIG_PLAX56XP4)
 	ptr[14] |= 0x89;
 #else
 	ptr[14] |= 0x80;

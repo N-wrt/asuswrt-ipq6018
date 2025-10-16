@@ -6,20 +6,5 @@ choice
 config PLAX56XP4
 	bool "PL-AX56_XP4 (IPQ6018 + QCA7550)"
 
-config RT360V6
-	bool "RT-360V6 (IPQ6018 + QCA7550)"
-
-config RTAX18
-	bool "RT-AX18 (IPQ6018 + QCA7550)"
-
-config RTAX5
-	bool "RT-AX5 (IPQ6018 + QCA7550)"
-
-config RTW212X
-	bool "RT-W212X (IPQ6018 + QCA7550)"
-
-config RTMANGO
-	bool "RT-MANGO (IPQ6018 + QCA7550)"
-
 endchoice
 
