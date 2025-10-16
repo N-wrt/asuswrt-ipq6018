@@ -853,6 +853,7 @@ ifeq ($(UBIIMG),y)
 	@$(CROSS_COMPILE)objcopy -O binary $(LINUXDIR)/vmlinux $(PLATFORMDIR)/vmlinus
 	@gzip -9 -c $(PLATFORMDIR)/vmlinus > $(PLATFORMDIR)/360v6.kernel
 	@cp -f $(PLATFORMDIR)/360v6.kernel $(PLATFORMDIR)/Image.img
+	@cp -f $(PLATFORMDIR)/target.image image/rootfs.bin
 
 	@SIZE=`wc -c $(PLATFORMDIR)/Image.img | awk '{print $$1}'`; \
 		PAD=`expr 64 - $${SIZE} % 64` ; \
@@ -861,9 +862,11 @@ endif
 	asustools/mkits.sh -D qcom-ipq6018-cp03-c1 -o image/fit-qcom-ipq6018-cp03-c1.its -k $(PLATFORMDIR)/zImage.img -r $(PLATFORMDIR)/target.image -d $(LINUXDIR)/arch/arm/boot/dts/qcom-ipq6018-$(lowercase_B).dtb -C lzma -a 0x$(LOADADDR) -e 0x$(ENTRYADDR) -A $(ARCH) -v $(KERNEL_VER)
 	asustools/mkimage -f image/fit-qcom-ipq6018-cp03-c1.its image/$(IMGNAME).img
 ifeq ($(UBIIMG),y)
-	scripts/mkits.sh -D qcom-ipq6018-cp03-c1 -o image/fit-qcom-ipq6018-cp03-c1-ubi.its -k $(PLATFORMDIR)/Image.img -d $(LINUXDIR)/arch/arm/boot/dts/qcom-ipq6018-$(lowercase_B)-ubi.dtb  -C gzip -a 0x$(LOADADDR) -e 0x$(ENTRYADDR)  -c config@cp03-c1 -A $(ARCH) -v $(KERNEL_VER)
-	asustools/mkimage -f image/fit-qcom-ipq6018-cp03-c1-ubi.its image/$(IMGNAME).u
-	scripts/ubinize-image.sh    --kernel image/$(IMGNAME).u  $(PLATFORMDIR)/target.image Factory/$(lowercase_B).bin image/$(IMGNAME).ubi  -p 128KiB -m 2048
+	scripts/mkits.sh -D qcom-ipq6018-cp03-c1 -o image/fit-qcom-ipq6018-cp03-c1.its -k $(PLATFORMDIR)/Image.img -d $(LINUXDIR)/arch/arm/boot/dts/qcom-ipq6018-$(lowercase_B).dtb  -C gzip -a 0x$(LOADADDR) -e 0x$(ENTRYADDR)  -c config@cp03-c1 -A $(ARCH) -v $(KERNEL_VER)
+	asustools/mkimage -f image/fit-qcom-ipq6018-cp03-c1.its image/kernel.bin
+	# cat image/kernel.bin image/rootfs.bin > image/combined.img
+	tar -cf image/combined.tar image/kernel.bin image/rootfs.bin
+	scripts/ubinize-image.sh    --kernel image/kernel.bi  image/rootfs.bin Factory/$(lowercase_B).bin image/$(NEW_IMGNAME).ubi  -p 128KiB -m 2048
 endif
 else ifeq ($(IPQ50XX),y)
 ifeq ($(MUSL64),y)
@@ -880,20 +883,20 @@ endif
 	@echo -n "" > image/tail_info
 ifeq ($(TRX_TAIL_INFO),y)
 	asustools/mktail -o image/tail_info -t 1 -f 0 -b $(SERIALNO) -e $(EXTENDNO) -r 0 -r $(SFINFO)
-	cat image/tail_info >> image/$(IMGNAME).img
+	cat image/tail_info >> image/combined.tar
 endif
 	#generate ASUS Image
-	@ISIZE=`wc -c image/$(IMGNAME).img | awk '{print $$1}'` ; \
+	@ISIZE=`wc -c image/combined.tar | awk '{print $$1}'` ; \
 		TSIZE=`wc -c image/tail_info | awk '{print $$1}'`; \
-		KSIZE=`wc -c $(PLATFORMDIR)/zImage.img | awk '{print $$1}'` ; \
-		RSIZE=`wc -c $(PLATFORMDIR)/target.image | awk '{print $$1}'` ; \
+		KSIZE=`wc -c image/kernel.bin | awk '{print $$1}'` ; \
+		RSIZE=`wc -c image/rootfs.bin | awk '{print $$1}'` ; \
 		PAD2=`expr $${ISIZE} - $${KSIZE} - $${RSIZE} - $${TSIZE}` ; \
 		RFSOFFSET=`expr 64 + $${KSIZE} + $${PAD2}` ; \
 		TRANS_ARCH=`if [ "$(ARCH)" = "arm64" ]; then echo -n arm; else echo -n $(ARCH); fi` ; \
 		echo "PAD2: $${PAD2}" ; \
 	asustools/mkimage -A $${TRANS_ARCH} -O linux -T kernel -C lzma -a $(LOADADDR) -e $(ENTRYADDR) -r $${RFSOFFSET} \
 			-n $(BUILD_NAME) -V "$(KERNEL_VER)" "$(FS_VER)" "$(SERIALNO)" "$(EXTENDNO)" "0" "0" "0" "0" "0" "0" \
-			-d image/$(IMGNAME).img image/$(NEW_IMGNAME).trx
+			-d image/combined.tar image/$(NEW_IMGNAME).trx
 else
 	@if [ -n "$(DTB)" -a ! -e $(LINUXDIR)/arch/$(ARCH)/boot/dts/$(DTB) ] ; then \
 		echo "$(LINUXDIR)/arch/$(ARCH)/boot/dts/$(DTB) not found!!!" ; \
