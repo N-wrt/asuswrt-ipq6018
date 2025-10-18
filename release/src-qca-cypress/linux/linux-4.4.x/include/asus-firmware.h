@@ -9,7 +9,7 @@
 #define	MTD_FACTORY_PART_SIZE	0x20000
 
 /* nor + nand case */
-#define MTD_NOR_PLUS_NAND_BOOT_SIZE	0x200000
+#define MTD_NOR_PLUS_NAND_BOOT_SIZE	0x6A0000
 
 #define	MTD_KERN_PART_SIZE	0	/* fix-up at run-time */
 #define	MTD_ROOTFS_PART_SIZE	0	/* fix-up at run-time */

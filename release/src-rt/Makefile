@@ -866,7 +866,7 @@ ifeq ($(UBIIMG),y)
 	asustools/mkimage -f image/fit-qcom-ipq6018-cp03-c1.its image/kernel.bin
 	# cat image/kernel.bin image/rootfs.bin > image/combined.img
 	tar -cf image/combined.tar image/kernel.bin image/rootfs.bin
-	scripts/ubinize-image.sh    --kernel image/kernel.bi  image/rootfs.bin Factory/$(lowercase_B).bin image/$(NEW_IMGNAME).ubi  -p 128KiB -m 2048
+	scripts/ubinize-image.sh    --kernel image/kernel.bin  image/rootfs.bin Factory/Factory.bin image/$(NEW_IMGNAME).ubi  -p 128KiB -m 2048
 endif
 else ifeq ($(IPQ50XX),y)
 ifeq ($(MUSL64),y)

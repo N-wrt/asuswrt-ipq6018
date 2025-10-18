@@ -5944,19 +5944,34 @@ int init_nvram(void)
 		} else {
 			set_basic_ifname_vars(wan_ifaces, "eth3 eth1 eth0", wl_ifaces, NULL, NULL, NULL, NULL, 0);
 		}
-		nvram_set_int("btn_rst_gpio", 19|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_blue_gpio", 72);
-		nvram_set_int("led_green_gpio", 73);
+	    if (xp4_old)
+		nvram_unset("btn_rst_gpio");
+	    else if(0)
+		nvram_set_int("btn_rst_gpio", 0|GPIO_ACTIVE_LOW);
+	    else
+		nvram_set_int("btn_rst_gpio", 34|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio", 9|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_blue_gpio", 73);
+	    if (xp4_old) {
+		nvram_set_int("led_green_gpio", 33);
+		nvram_set_int("led_red_gpio", 32);
+	    } else {
+		nvram_set_int("led_green_gpio", 72);
 		nvram_set_int("led_red_gpio", 71);
+	    }
 
-		nvram_set_int("btn_rst_gpio_1", 60|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_wps_gpio_1", 9|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_rst_gpio_1", 19|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio_1", 9);
 		nvram_set_int("led_white_gpio", 22);
 
 		/* enable bled */
 		config_netdev_bled("led_blue_gpio", "ath1");
 		add_gpio_to_bled("led_blue_gpio", "led_green_gpio");
 		add_gpio_to_bled("led_blue_gpio", "led_red_gpio");
+		if (RGBLED_WHITE & RGBLED_WLED)
+			add_gpio_to_bled("led_blue_gpio", "led_white_gpio");
+		if (nvram_match("success_start_service", "0"))
+			set_rgbled(RGBLED_BOOTING);
 
 		if (nvram_match("HwId", "A")) {
 #ifdef RTCONFIG_XHCIMODE

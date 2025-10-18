@@ -295,11 +295,12 @@ static int m25p_probe(struct spi_device *spi)
 #else
 	data = &fake_data;
 	nor->mtd.name = data->name;
+	is_norplusnand = 1;
 	if ( is_norplusnand == 2 )
 		; // nothing
 	else if ( is_norplusnand == 1 ) {
 		/* Register the partitions */
-		mtd_device_register(&nor->mtd, &msm_norplusnand_partitions, ARRAY_SIZE(msm_norplusnand_partitions));
+		mtd_device_register(&nor->mtd, msm_norplusnand_partitions, ARRAY_SIZE(msm_norplusnand_partitions));
 	} else {
 		offs = MTD_BOOT_PART_SIZE + MTD_CONFIG_PART_SIZE + MTD_FACTORY_PART_SIZE;
 

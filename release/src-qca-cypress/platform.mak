@@ -224,7 +224,9 @@ define platformKernelConfig
 				sed -i "/CONFIG_MTD_MSM_NAND\>/d" $(1); \
 				echo "CONFIG_MTD_MSM_NAND=y" >> $(1); \
 				sed -i "/CONFIG_MTD_M25P80\>/d" $(1); \
-				echo "# CONFIG_MTD_M25P80 is not set" >> $(1); \
+				echo "CONFIG_MTD_M25P80=y" >> $(1); \
+				sed -i "/CONFIG_SPI_QUP\>/d" $(1); \
+				echo "CONFIG_SPI_QUP=y" >> $(1); \
 			fi; \
 			sed -i "/CONFIG_BRIDGE_EBT_ARPNAT/d" $(1); \
 			echo "# CONFIG_BRIDGE_EBT_ARPNAT is not set" >>$(1); \
