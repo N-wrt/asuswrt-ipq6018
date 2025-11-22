@@ -1096,7 +1096,7 @@ static const char *query_ifname[PORT_UNITS] = { //Aimesh RE
 	NULL,   "vlan1",NULL,   NULL,   "vlan4",NULL
 #elif defined(PLAX56_XP4)
 //	P0	P1	P2	P3	P4	P5
-	"eth0",	"eth1",	"eth2",	"eth3",	"eth4",	"eth5"
+	"eth0",	"eth2",	"eth3",	"eth4",	"eth1",	NULL
 #else
 //	P0	P1	P2	P3	P4	P5
 	NULL,   NULL,   NULL,   NULL,   NULL,   NULL
