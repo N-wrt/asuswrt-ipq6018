@@ -91,7 +91,7 @@ static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
 };
 #elif defined(PLAX56_XP4)
 static const int vport_to_phy_addr[MAX_WANLAN_PORT] = {
-	1, 3, 4, 5, 2,
+	3, 4, -1, -1, 2,
 };
 #else
 #error FIXME
@@ -115,7 +115,7 @@ static const char *vport_to_iface[MAX_WANLAN_PORT] = {
 };
 #elif defined(PLAX56_XP4)
 static const char *vport_to_iface[MAX_WANLAN_PORT] = {
-	"eth0", "eth2", "eth3", "eth4",		/* LAN1~4 */
+	"eth2", "eth3",  NULL, NULL,		/* LAN1~4 */
 	"eth1" 					/* WAN1 */
 };
 #else
@@ -156,7 +156,7 @@ static unsigned int wans_lan_mask = 0;	/* wan_type = WANS_DUALWAN_IF_LAN. */
  * array value:	Model-specific virtual port number
  */
 static int n56u_to_model_port_mapping[] = {
-#if 0 // shift LAN3/LAN4 -> LAN1/LAN2
+#if defined(PLAX56_XP4) // shift LAN3/LAN4 -> LAN1/LAN2
 	LAN2_PORT,	//0000 0000 0100 LAN2
 	LAN1_PORT,	//0000 0000 1000 LAN1
 #else
