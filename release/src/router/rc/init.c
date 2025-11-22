@@ -5903,7 +5903,7 @@ int init_nvram(void)
 		{ // XP4
 			/* NEED to sync with the default HwVer in flash image */
 			int xp4_old = (nvram_get_int("HwVer") < 1);
-		/* PLC on eth1 */
+		/* PLC on eth4 */
 		if (!strlen(nvram_safe_get("HwId"))) { // for old SR sample
 			_dprintf("!!!WARNING!!! No HwId found, setto A!!\n");
 			nvram_set("HwId", "A");
@@ -5911,7 +5911,7 @@ int init_nvram(void)
 		nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
 		nvram_set("lan_ifname", "br0");
 		if (nvram_match("HwId", "A")) {
-			wan_ifaces[WAN_IFACE_ID] = "eth4";
+			wan_ifaces[WAN_IFACE_ID] = "eth1";  // eth4 -> eth1
 		} else {
 			wan_ifaces[WAN_IFACE_ID] = "eth2"; // LAN1 port, follow CD6N rule
 		}
@@ -5921,28 +5921,28 @@ int init_nvram(void)
 		if (nvram_match("HwId", "A")) {
 #ifdef RTCONFIG_DUALWAN
 			lan_1=NULL;
-			strcpy(lan_ifs,"eth3 eth2 eth1 eth0");
+			strcpy(lan_ifs,"eth3 eth2 eth4 eth0");  // eth1 -> eth4
 			if (sw_mode() == SW_MODE_ROUTER && get_wans_dualwan() & WANSCAP_LAN) {
 				memset(lan_ifs,0, sizeof(lan_ifs));
 				if (nvram_match("wans_lanport", "1")) //lan port1
 				{	
 					lan_1="eth2";
-					strcpy(lan_ifs,"eth3 eth1 eth0");
+					strcpy(lan_ifs,"eth3 eth4 eth0");  // eth1 -> eth4
 				}
 				else if (nvram_match("wans_lanport", "2")) //lan port2
 				{			
 					lan_1="eth3";
-					strcpy(lan_ifs,"eth2 eth1 eth0");
+					strcpy(lan_ifs,"eth2 eth4 eth0");  // eth1 -> eth4
 				}
 				else
 					_dprintf("error setting\n");
 			}
 			set_basic_ifname_vars(wan_ifaces, lan_ifs, wl_ifaces, "usb", NULL, NULL , lan_1, 0);
 #else				
-			set_basic_ifname_vars(wan_ifaces, "eth3 eth2 eth1 eth0", wl_ifaces, "usb", NULL, NULL, NULL, 0);
+			set_basic_ifname_vars(wan_ifaces, "eth3 eth2 eth4 eth0", wl_ifaces, "usb", NULL, NULL, NULL, 0);  // eth1 -> eth4
 #endif			
 		} else {
-			set_basic_ifname_vars(wan_ifaces, "eth3 eth1 eth0", wl_ifaces, NULL, NULL, NULL, NULL, 0);
+			set_basic_ifname_vars(wan_ifaces, "eth3 eth4 eth0", wl_ifaces, NULL, NULL, NULL, NULL, 0);  // eth1 -> eth4
 		}
 	    if (xp4_old)
 		nvram_unset("btn_rst_gpio");
@@ -6022,11 +6022,11 @@ int init_nvram(void)
 #if defined(RTCONFIG_AMAS) /* AMAS_ETHDETECT should be enabled */
 		if (nvram_match("HwId", "B"))
 			nvram_set("wired_ifnames", "");
-		else { // HwId A, XP4R only PLC(eth1) is dynamic WAN/LAN
+		else { // HwId A, XP4R only PLC(eth4) is dynamic WAN/LAN  // eth1 -> eth4
 			if (aimesh_re_node())
 				nvram_set("wired_ifnames", "eth2 eth3 eth0");
 			else
-				nvram_set("wired_ifnames", "eth2 eth3 eth1 eth0");
+				nvram_set("wired_ifnames", "eth2 eth3 eth4 eth0");  // eth1 -> eth4
 		}
 #endif
 

@@ -16,6 +16,7 @@
 
 #include "../../../arm64/boot/dts/qcom/qcom-ipq6018-cp03-c1.dts"
 #include "qcom-ipq6018.dtsi"
+#include <dt-bindings/input/input.h>
 
 / {
 	#address-cells = <0x2>;
@@ -26,16 +27,16 @@
         qcom,msm-id = <0x192 0x0>;
 
 	aliases {
-                serial0 = &blsp1_uart3;
+		serial0 = &blsp1_uart3;
 		/*
 		 * Aliases as required by u-boot
 		 * to patch MAC addresses
 		 */
 		ethernet0 = "/soc/dp1";
 		ethernet1 = "/soc/dp2";
-                ethernet2 = "/soc/dp3";
-                ethernet3 = "/soc/dp4";
-                ethernet4 = "/soc/dp5";
+		ethernet2 = "/soc/dp3";
+		ethernet3 = "/soc/dp4";
+		ethernet4 = "/soc/dp5";
 	};
 
 	chosen {
@@ -46,7 +47,7 @@
 };
 
 &tlmm {
- 	uart_pins: uart_pins {
+	uart_pins: uart_pins {
 		mux {
 			pins = "gpio44", "gpio45";
 			function = "blsp2_uart";
@@ -64,6 +65,44 @@
 		};
 	};
 
+	button_pins: button_pins {
+		wps_button {
+			pins = "gpio9";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+
+		reset_button {
+			pins = "gpio42";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+
+	leds_pins: leds_pins {
+		led_5g {
+			pins = "gpio69";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+		led_2g {
+			pins = "gpio70";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+		led_usb0 {
+			pins = "gpio50";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
 };
 
 &soc {
@@ -78,15 +117,15 @@
 		phy1: ethernet-phy@1 {
 			reg = <1>;
 		};
-                phy2: ethernet-phy@2 {
-                        reg = <2>;
-                };
-                phy3: ethernet-phy@3 {
-                        reg = <3>;
-                };
-                phy4: ethernet-phy@4 {
-                        reg = <4>;
-                };
+		phy2: ethernet-phy@2 {
+			reg = <2>;
+		};
+		phy3: ethernet-phy@3 {
+			reg = <3>;
+		};
+		phy4: ethernet-phy@4 {
+			reg = <4>;
+		};
 	};
 
 	ess-switch@3a000000 {
@@ -145,41 +184,87 @@
 		phy-mode = "sgmii";
 	};
 
-        dp3 {
-                device_type = "network";
-                compatible = "qcom,nss-dp";
-                qcom,id = <3>;
-                reg = <0x3a001400 0x200>;
-                qcom,mactype = <0>;
-                local-mac-address = [000000000000];
-                qcom,link-poll = <1>;
-                qcom,phy-mdio-addr = <2>;
-                phy-mode = "sgmii";
-        };
+	dp3 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <3>;
+		reg = <0x3a001400 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <2>;
+		phy-mode = "sgmii";
+	};
 
-        dp4 {
-                device_type = "network";
-                compatible = "qcom,nss-dp";
-                qcom,id = <4>;
-                reg = <0x3a001600 0x200>;
-                qcom,mactype = <0>;
-                local-mac-address = [000000000000];
-                qcom,link-poll = <1>;
-                qcom,phy-mdio-addr = <3>;
-                phy-mode = "sgmii";
-        };
+	dp4 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <4>;
+		reg = <0x3a001600 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <3>;
+		phy-mode = "sgmii";
+	};
 
-        dp5 {
-                device_type = "network";
-                compatible = "qcom,nss-dp";
-                qcom,id = <5>;
-                reg = <0x3a001800 0x200>;
-                qcom,mactype = <0>;
-                local-mac-address = [000000000000];
-                qcom,link-poll = <1>;
-                qcom,phy-mdio-addr = <4>;
-                phy-mode = "sgmii";
-        };
+	dp5 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <5>;
+		reg = <0x3a001800 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <4>;
+		phy-mode = "sgmii";
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&button_pins>;
+		pinctrl-names = "default";
+
+		wps {
+			label = "wps";
+			linux,code = <KEY_WPS_BUTTON>;
+			gpios = <&tlmm 42 GPIO_ACTIVE_HIGH>;
+			linux,input-type = <1>;
+			debounce-interval = <60>;
+		};
+		reset {
+			label = "reset";
+			linux,code = <KEY_POWER>;
+			gpios = <&tlmm 9 GPIO_ACTIVE_HIGH>;
+			linux,input-type = <1>;
+			debounce-interval = <60>;
+		};
+	};
+	
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-0 = <&leds_pins>;
+		pinctrl-names = "default";
+
+		led@35 {
+			label = "led_5g";
+			gpios = <&tlmm 69 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "led_5g";
+			default-state = "off";
+		};
+		led@37 {
+			label = "led_2g";
+			gpios = <&tlmm 70 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "led_2g";
+			default-state = "off";
+		};
+		led@50 {
+			label = "led_usb0";
+			gpios = <&tlmm 50 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "usb-host";
+			default-state = "off";
+		};
+	};
 
 	serial@78b0000 {
 	        status = "disabled";
