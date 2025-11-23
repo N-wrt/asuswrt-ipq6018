@@ -1338,7 +1338,7 @@ void start_dnsmasq(void)
 		fprintf(fp, "%s %s.local\n", lan_ipaddr, lan_hostname);
 
 		/* default names */
-		fprintf(fp, "%s %s\n", lan_ipaddr, DUT_DOMAIN_NAME);
+		//fprintf(fp, "%s %s\n", lan_ipaddr, DUT_DOMAIN_NAME);
 		fprintf(fp, "%s %s\n", lan_ipaddr, OLD_DUT_DOMAIN_NAME1);
 		fprintf(fp, "%s %s\n", lan_ipaddr, OLD_DUT_DOMAIN_NAME2);
 #if defined(RTAC68U) || defined(RPAX56) || defined(RPAX58)
