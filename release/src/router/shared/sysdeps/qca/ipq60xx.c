@@ -59,7 +59,7 @@ enum {
 
 static const char *upstream_iptv_ifaces[16] = {
 #if defined(PLAX56_XP4)
-	[WANS_DUALWAN_IF_WAN] = "eth4",
+	[WANS_DUALWAN_IF_WAN] = "eth2",
 #else
 #error Define WAN interfaces that can be used as upstream port of IPTV.
 #endif
