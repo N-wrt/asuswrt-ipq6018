@@ -5898,27 +5898,18 @@ int init_nvram(void)
 #endif	/* PLAC66U */
 
 #if defined(PLAX56_XP4)
-//#define XP4_OLD
 	case MODEL_PLAX56XP4:
 		{ // XP4
-			/* NEED to sync with the default HwVer in flash image */
-			int xp4_old = (nvram_get_int("HwVer") < 1);
-		/* PLC on eth1 */
 		if (!strlen(nvram_safe_get("HwId"))) { // for old SR sample
 			_dprintf("!!!WARNING!!! No HwId found, setto A!!\n");
 			nvram_set("HwId", "A");
 		}
 		nvram_set("boardflags", "0x100"); // although it is not used in ralink driver, set for vlan
 		nvram_set("lan_ifname", "br0");
-		if (nvram_match("HwId", "A")) {
-			wan_ifaces[WAN_IFACE_ID] = "eth4";
-		} else {
-			wan_ifaces[WAN_IFACE_ID] = "eth2"; // LAN1 port, follow CD6N rule
-		}
+		wan_ifaces[WAN_IFACE_ID] = "eth4";
 		wl_ifaces[WL_5G_BAND] = "ath0";
 		wl_ifaces[WL_2G_BAND] = "ath1";
 		//doSystem("ls /proc/device-tree/soc | grep dp | wc -l > /tmp/dp_cnt");
-		if (nvram_match("HwId", "A")) {
 #ifdef RTCONFIG_DUALWAN
 			lan_1=NULL;
 			strcpy(lan_ifs,"eth3 eth2 eth1");
@@ -5941,25 +5932,13 @@ int init_nvram(void)
 #else				
 			set_basic_ifname_vars(wan_ifaces, "eth3 eth2 eth1", wl_ifaces, "usb", NULL, NULL, NULL, 0);
 #endif			
-		} else {
-			set_basic_ifname_vars(wan_ifaces, "eth3 eth1", wl_ifaces, NULL, NULL, NULL, NULL, 0);
-		}
-	    if (xp4_old)
-		nvram_unset("btn_rst_gpio");
-	    else if(0)
-		nvram_set_int("btn_rst_gpio", 0|GPIO_ACTIVE_LOW);
-	    else
 		nvram_set_int("btn_rst_gpio", 34|GPIO_ACTIVE_LOW);
 		nvram_set_int("btn_wps_gpio", 9|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_blue_gpio", 35);
-	    if (xp4_old) {
-		nvram_set_int("led_green_gpio", 33);
-		nvram_set_int("led_red_gpio", 32);
-	    } else {
+		nvram_set_int("led_blue_gpio", 37|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_green_gpio", 50);
-		nvram_set_int("led_red_gpio", 37);
-	    }
-		nvram_set_int("btn_rst_gpio_1", 8|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_red_gpio", 35|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_rst_gpio_1", 9|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_wps_gpio_1", 8|GPIO_ACTIVE_LOW);
 
 		/* enable bled */
 		config_netdev_bled("led_blue_gpio", "ath1");
@@ -5970,7 +5949,6 @@ int init_nvram(void)
 		if (nvram_match("success_start_service", "0"))
 			set_rgbled(RGBLED_BOOTING);
 
-		if (nvram_match("HwId", "A")) {
 #ifdef RTCONFIG_XHCIMODE
 			nvram_set("xhci_ports", "2-1");
 			nvram_set("ehci_ports", "1-1");
@@ -5987,15 +5965,6 @@ int init_nvram(void)
 			}
 #endif
 			add_rc_support("usbX1");
-		} else {
-			nvram_set("xhci_ports", "");
-			nvram_set("ehci_ports", "");
-			nvram_set("ohci_ports", "");
-			nvram_set_int("usb_enable", 0);
-			nvram_set_int("usb_usb3", 0);
-			nvram_set_int("usb_usb2", 0);
-			nvram_set_int("usb_ohci", 0);
-		}
 		nvram_set("ct_max", "300000"); // force
 
 		if (nvram_get("wl_mssid") && nvram_match("wl_mssid", "1"))
@@ -6020,52 +5989,33 @@ int init_nvram(void)
 		nvram_set("wl1_HT_TxStream", "2");
 		nvram_set("wl1_HT_RxStream", "2");
 #if defined(RTCONFIG_AMAS) /* AMAS_ETHDETECT should be enabled */
-		if (nvram_match("HwId", "B"))
-			nvram_set("wired_ifnames", "");
-		else { // HwId A, XP4R only PLC(eth1) is dynamic WAN/LAN
-			if (aimesh_re_node())
-				nvram_set("wired_ifnames", "eth2 eth3");
-			else
-				nvram_set("wired_ifnames", "eth2 eth3 eth1");
-		}
+		// HwId A, XP4R only PLC(eth1) is dynamic WAN/LAN
+		if (aimesh_re_node())
+			nvram_set("wired_ifnames", "eth2 eth3");
+		else
+			nvram_set("wired_ifnames", "eth2 eth3 eth1");
 #endif
 
 #if defined(RTCONFIG_AMAS) /* AMAS_ETHDETECT should be enabled */
-		if (nvram_match("HwId", "B")) { // Node, follow CD6N
-			if (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "0")) {
-				/* for ATE test in AP mode */
-				nvram_set("eth_ifnames", "");
-			} else {
-				nvram_set("wl1_channel", "36"); /* fixed channel speeds up sta1 connection */
-				nvram_set("eth_ifnames", "eth1 eth2 eth3"); /* PLC, LAN1, LAN2 */
-				nvram_set("amas_ethif_type", "4 4 4"); /* PLC, 1G, 1G */
-				nvram_set("eth_priority", "0 3 1" " 1 1 1" " 2 2 1"); /* PLC priority:3, LAN1:1, LAN2:2 */
-				nvram_set("sta_priority", "2 0 5 1" " 5 1 4 1"); /* 2G priority:5, 5G priority:4 */
-				nvram_set("sta_phy_ifnames", "sta1 sta0"); /* 2G name, 5G name */
-				nvram_set("sta_ifnames", "sta1 sta0"); /* 2G name, 5G name */
-				nvram_unset("dfschinfo");
-			}
-			nvram_set("disable_ui", "0");
+		// Router
+		if (nvram_get_int("x_Setting") == 0 || (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1"))) {
+			_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
+						__func__, __LINE__,
+						sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
+			nvram_set("eth_ifnames", "eth1 eth4"); /* PLC(eth1), normal WAN(eth4)*/
+			nvram_set("fixed_eth_ifnames", "eth4"); /* XP4R WAN(eth4) only as wan */
+			nvram_set("amas_ethif_type", "4 4"); /* PLC, 1G */
+			nvram_set("eth_priority", "0 2 1" " 1 1 1"); /* PLC priority:2, WAN priority:1 */
+			nvram_set("sta_priority", "2 0 4 1" " 5 1 3 1"); /* 2G priority:4, 5G priority:3 */
+			nvram_set("sta_phy_ifnames", "sta1 sta0"); /* 2G name, 5G name */
+			nvram_set("sta_ifnames", "sta1 sta0"); /* 2G name, 5G name */
+			nvram_unset("dfschinfo");
 			add_led_ctrl_capability(LED_ON_OFF);
-		} else { // Router
-			if (nvram_get_int("x_Setting") == 0 || (sw_mode() == SW_MODE_AP && nvram_match("re_mode", "1"))) {
-				_dprintf("[%s][%d] sw mode = %d, repeater=%d, ap= %d ",
-							__func__, __LINE__,
-							sw_mode(),SW_MODE_REPEATER,SW_MODE_AP);
-				nvram_set("eth_ifnames", "eth1 eth4"); /* PLC(eth1), normal WAN(eth4)*/
-				nvram_set("fixed_eth_ifnames", "eth4"); /* XP4R WAN(eth4) only as wan */
-				nvram_set("amas_ethif_type", "4 4"); /* PLC, 1G */
-				nvram_set("eth_priority", "0 2 1" " 1 1 1"); /* PLC priority:2, WAN priority:1 */
-				nvram_set("sta_priority", "2 0 4 1" " 5 1 3 1"); /* 2G priority:4, 5G priority:3 */
-				nvram_set("sta_phy_ifnames", "sta1 sta0"); /* 2G name, 5G name */
-				nvram_set("sta_ifnames", "sta1 sta0"); /* 2G name, 5G name */
-				nvram_unset("dfschinfo");
-				add_led_ctrl_capability(LED_ON_OFF);
-			}
-			else {
-				nvram_unset("eth_ifnames");	//unset, or the eth1 would not be add to LAN bridge (br0)
-			}
 		}
+		else {
+			nvram_unset("eth_ifnames");	//unset, or the eth1 would not be add to LAN bridge (br0)
+		}
+		
 		if (strcmp(get_2g_hwaddr(), "00:AA:BB:CC:DD:E0") == 0 && strcmp(get_5g_hwaddr(), "00:AA:BB:CC:DD:E4") == 0) {
 			nvram_set("eth_ifnames", "eth4"); /* only normal WAN(eth4), so PLC could be keep in bridge for PLC test in factory */
 		}
