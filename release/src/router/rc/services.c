@@ -1338,7 +1338,7 @@ void start_dnsmasq(void)
 		fprintf(fp, "%s %s.local\n", lan_ipaddr, lan_hostname);
 
 		/* default names */
-		fprintf(fp, "%s %s\n", lan_ipaddr, DUT_DOMAIN_NAME);
+		//fprintf(fp, "%s %s\n", lan_ipaddr, DUT_DOMAIN_NAME);
 		fprintf(fp, "%s %s\n", lan_ipaddr, OLD_DUT_DOMAIN_NAME1);
 		fprintf(fp, "%s %s\n", lan_ipaddr, OLD_DUT_DOMAIN_NAME2);
 #if defined(RTAC68U) || defined(RPAX56) || defined(RPAX58)
@@ -12402,7 +12402,7 @@ again:
 						int header_size = 64;      // 头部64字节
 						int trailer_size = 24;     // 尾部24字节
 						
-						printf("Processing packaged upgrade file...\n");
+						printf("Processing packaged upgrade file for complete A/B system update...\n");
 						printf("Header: %d bytes, Trailer: %d bytes\n", header_size, trailer_size);
 						
 						// 获取升级文件的总大小
@@ -12462,32 +12462,15 @@ again:
 						printf("Found kernel.bin at: %s\n", kernel_path);
 						printf("Found rootfs.bin at: %s\n", rootfs_path);
 						
-						// 刷入kernel.bin到mmcblk0p17
-						printf("Flashing kernel.bin to /dev/mmcblk0p17...\n");
-						
 						// 获取kernel.bin的大小
 						if (stat(kernel_path, &st) != 0) {
 							printf("Error: Cannot access kernel.bin at %s\n", kernel_path);
 							system("rm -rf /tmp/upgrade_extract");
 							return;
 						}
-						
 						int kernel_size = st.st_size;
 						int kernel_blocks = (kernel_size + 511) / 512;
 						printf("Kernel size: %d bytes, %d blocks\n", kernel_size, kernel_blocks);
-						
-						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null", kernel_path);
-						printf("Executing: %s\n", cmd);
-						ret = system(cmd);
-						if (ret != 0) {
-							printf("Error: Failed to flash kernel (return code: %d)\n", ret);
-							system("rm -rf /tmp/upgrade_extract");
-							return;
-						}
-						printf("Kernel flashed to /dev/mmcblk0p17 (%d blocks)\n", kernel_blocks);
-						
-						// 刷入rootfs.bin到mmcblk0p18
-						printf("Flashing rootfs.bin to /dev/mmcblk0p18...\n");
 						
 						// 获取rootfs.bin的大小
 						if (stat(rootfs_path, &st) != 0) {
@@ -12495,7 +12478,6 @@ again:
 							system("rm -rf /tmp/upgrade_extract");
 							return;
 						}
-						
 						int rootfs_size = st.st_size;
 						int rootfs_blocks = (rootfs_size + 511) / 512;
 						printf("Rootfs size: %d bytes, %d blocks\n", rootfs_size, rootfs_blocks);
@@ -12510,12 +12492,40 @@ again:
 							printf("Limiting rootfs to %d blocks (target partition size)\n", rootfs_blocks);
 						}
 						
+						// ========== 开始写入所有4个分区 ==========
+						
+						// 1. 刷入kernel.bin到mmcblk0p16 (Kernel A)
+						printf("\n=== Flashing kernel to /dev/mmcblk0p16 (Kernel A) ===\n");
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p16 bs=512 conv=sync 2>/dev/null", kernel_path);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash kernel to p16 (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Kernel flashed to /dev/mmcblk0p16 successfully\n");
+						
+						// 2. 刷入kernel.bin到mmcblk0p17 (Kernel B)
+						printf("\n=== Flashing kernel to /dev/mmcblk0p17 (Kernel B) ===\n");
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null", kernel_path);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash kernel to p17 (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Kernel flashed to /dev/mmcblk0p17 successfully\n");
+						
+						// 3. 刷入rootfs.bin到mmcblk0p18 (Rootfs A)
+						printf("\n=== Flashing rootfs to /dev/mmcblk0p18 (Rootfs A) ===\n");
 						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
 								 rootfs_path, rootfs_blocks);
 						printf("Executing: %s\n", cmd);
 						ret = system(cmd);
 						if (ret != 0) {
-							printf("Error: Failed to flash rootfs (return code: %d)\n", ret);
+							printf("Error: Failed to flash rootfs to p18 (return code: %d)\n", ret);
 							system("rm -rf /tmp/upgrade_extract");
 							return;
 						}
@@ -12524,42 +12534,93 @@ again:
 						// 如果目标分区比写入的数据大，用零填充剩余空间
 						if (rootfs_blocks < target_partition_blocks) {
 							int fill_blocks = target_partition_blocks - rootfs_blocks;
-							printf("Filling remaining %d blocks with zeros...\n", fill_blocks);
+							printf("Filling remaining %d blocks with zeros in p18...\n", fill_blocks);
 							
 							snprintf(cmd, sizeof(cmd), 
 									 "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
 									 rootfs_blocks, fill_blocks);
 							ret = system(cmd);
 							if (ret != 0) {
-								printf("Error: dd zero-fill command failed with return code %d\n", ret);
+								printf("Error: dd zero-fill command failed for p18 with return code %d\n", ret);
 								system("rm -rf /tmp/upgrade_extract");
 								return;
 							}
-							printf("Padding completed\n");
+							printf("Padding completed for p18\n");
 						}
 						
-						// 验证刷写结果
-						printf("Verifying flash operation...\n");
+						// 4. 刷入rootfs.bin到mmcblk0p20 (Rootfs B)
+						printf("\n=== Flashing rootfs to /dev/mmcblk0p20 (Rootfs B) ===\n");
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p20 bs=512 count=%d conv=sync 2>/dev/null", 
+								 rootfs_path, rootfs_blocks);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash rootfs to p20 (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Rootfs flashed to /dev/mmcblk0p20 (%d blocks)\n", rootfs_blocks);
 						
-						// 检查kernel分区
-						printf("Kernel partition (/dev/mmcblk0p17):\n");
+						// 如果目标分区比写入的数据大，用零填充剩余空间
+						if (rootfs_blocks < target_partition_blocks) {
+							int fill_blocks = target_partition_blocks - rootfs_blocks;
+							printf("Filling remaining %d blocks with zeros in p20...\n", fill_blocks);
+							
+							snprintf(cmd, sizeof(cmd), 
+									 "dd if=/dev/zero of=/dev/mmcblk0p20 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
+									 rootfs_blocks, fill_blocks);
+							ret = system(cmd);
+							if (ret != 0) {
+								printf("Error: dd zero-fill command failed for p20 with return code %d\n", ret);
+								system("rm -rf /tmp/upgrade_extract");
+								return;
+							}
+							printf("Padding completed for p20\n");
+						}
+						
+						// ========== 验证刷写结果 ==========
+						
+						printf("\n=== Verifying flash operation ===\n");
+						
+						// 检查所有kernel分区
+						printf("Kernel partition /dev/mmcblk0p16:\n");
+						system("dd if=/dev/mmcblk0p16 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						printf("Kernel partition /dev/mmcblk0p17:\n");
 						system("dd if=/dev/mmcblk0p17 bs=512 count=1 2>/dev/null | head -c 4");
 						printf("\n");
 						
-						// 检查rootfs分区
-						printf("Rootfs partition (/dev/mmcblk0p18):\n");
+						// 检查所有rootfs分区
+						printf("Rootfs partition /dev/mmcblk0p18:\n");
 						system("dd if=/dev/mmcblk0p18 bs=512 count=1 2>/dev/null | head -c 4");
 						printf("\n");
 						
+						printf("Rootfs partition /dev/mmcblk0p20:\n");
+						system("dd if=/dev/mmcblk0p20 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						// 显示分区信息
+						printf("\nPartition layout after update:\n");
+						system("ls -la /dev/mmcblk0p*");
+						printf("\nBlock device information:\n");
+						system("fdisk -l /dev/mmcblk0 | grep mmcblk0p");
+						
 						// 同步文件系统
+						printf("Syncing filesystems...\n");
 						system("sync");
 						
 						// 清理临时文件
 						system("rm -rf /tmp/upgrade_extract");
 						
-						printf("EMMC upgrade completed successfully!\n");
-						printf("Kernel: %d blocks in /dev/mmcblk0p17\n", kernel_blocks);
-						printf("Rootfs: %d blocks in /dev/mmcblk0p18\n", rootfs_blocks);
+						printf("\n=== Complete A/B System Update Successful! ===\n");
+						printf("Kernel updates:\n");
+						printf("  /dev/mmcblk0p16 (Kernel A): %d blocks\n", kernel_blocks);
+						printf("  /dev/mmcblk0p17 (Kernel B): %d blocks\n", kernel_blocks);
+						printf("Rootfs updates:\n");
+						printf("  /dev/mmcblk0p18 (Rootfs A): %d blocks\n", rootfs_blocks);
+						printf("  /dev/mmcblk0p20 (Rootfs B): %d blocks\n", rootfs_blocks);
+						printf("\nBoth A and B systems are now updated and ready for use.\n");
 
 					}
 #else
@@ -12862,7 +12923,7 @@ again:
 						int header_size = 64;      // 头部64字节
 						int trailer_size = 24;     // 尾部24字节
 						
-						printf("Processing packaged upgrade file...\n");
+						printf("Processing packaged upgrade file for complete A/B system update...\n");
 						printf("Header: %d bytes, Trailer: %d bytes\n", header_size, trailer_size);
 						
 						// 获取升级文件的总大小
@@ -12922,32 +12983,15 @@ again:
 						printf("Found kernel.bin at: %s\n", kernel_path);
 						printf("Found rootfs.bin at: %s\n", rootfs_path);
 						
-						// 刷入kernel.bin到mmcblk0p17
-						printf("Flashing kernel.bin to /dev/mmcblk0p17...\n");
-						
 						// 获取kernel.bin的大小
 						if (stat(kernel_path, &st) != 0) {
 							printf("Error: Cannot access kernel.bin at %s\n", kernel_path);
 							system("rm -rf /tmp/upgrade_extract");
 							return;
 						}
-						
 						int kernel_size = st.st_size;
 						int kernel_blocks = (kernel_size + 511) / 512;
 						printf("Kernel size: %d bytes, %d blocks\n", kernel_size, kernel_blocks);
-						
-						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null", kernel_path);
-						printf("Executing: %s\n", cmd);
-						ret = system(cmd);
-						if (ret != 0) {
-							printf("Error: Failed to flash kernel (return code: %d)\n", ret);
-							system("rm -rf /tmp/upgrade_extract");
-							return;
-						}
-						printf("Kernel flashed to /dev/mmcblk0p17 (%d blocks)\n", kernel_blocks);
-						
-						// 刷入rootfs.bin到mmcblk0p18
-						printf("Flashing rootfs.bin to /dev/mmcblk0p18...\n");
 						
 						// 获取rootfs.bin的大小
 						if (stat(rootfs_path, &st) != 0) {
@@ -12955,7 +12999,6 @@ again:
 							system("rm -rf /tmp/upgrade_extract");
 							return;
 						}
-						
 						int rootfs_size = st.st_size;
 						int rootfs_blocks = (rootfs_size + 511) / 512;
 						printf("Rootfs size: %d bytes, %d blocks\n", rootfs_size, rootfs_blocks);
@@ -12970,12 +13013,40 @@ again:
 							printf("Limiting rootfs to %d blocks (target partition size)\n", rootfs_blocks);
 						}
 						
+						// ========== 开始写入所有4个分区 ==========
+						
+						// 1. 刷入kernel.bin到mmcblk0p16 (Kernel A)
+						printf("\n=== Flashing kernel to /dev/mmcblk0p16 (Kernel A) ===\n");
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p16 bs=512 conv=sync 2>/dev/null", kernel_path);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash kernel to p16 (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Kernel flashed to /dev/mmcblk0p16 successfully\n");
+						
+						// 2. 刷入kernel.bin到mmcblk0p17 (Kernel B)
+						printf("\n=== Flashing kernel to /dev/mmcblk0p17 (Kernel B) ===\n");
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p17 bs=512 conv=sync 2>/dev/null", kernel_path);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash kernel to p17 (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Kernel flashed to /dev/mmcblk0p17 successfully\n");
+						
+						// 3. 刷入rootfs.bin到mmcblk0p18 (Rootfs A)
+						printf("\n=== Flashing rootfs to /dev/mmcblk0p18 (Rootfs A) ===\n");
 						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p18 bs=512 count=%d conv=sync 2>/dev/null", 
 								 rootfs_path, rootfs_blocks);
 						printf("Executing: %s\n", cmd);
 						ret = system(cmd);
 						if (ret != 0) {
-							printf("Error: Failed to flash rootfs (return code: %d)\n", ret);
+							printf("Error: Failed to flash rootfs to p18 (return code: %d)\n", ret);
 							system("rm -rf /tmp/upgrade_extract");
 							return;
 						}
@@ -12984,42 +13055,93 @@ again:
 						// 如果目标分区比写入的数据大，用零填充剩余空间
 						if (rootfs_blocks < target_partition_blocks) {
 							int fill_blocks = target_partition_blocks - rootfs_blocks;
-							printf("Filling remaining %d blocks with zeros...\n", fill_blocks);
+							printf("Filling remaining %d blocks with zeros in p18...\n", fill_blocks);
 							
 							snprintf(cmd, sizeof(cmd), 
 									 "dd if=/dev/zero of=/dev/mmcblk0p18 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
 									 rootfs_blocks, fill_blocks);
 							ret = system(cmd);
 							if (ret != 0) {
-								printf("Error: dd zero-fill command failed with return code %d\n", ret);
+								printf("Error: dd zero-fill command failed for p18 with return code %d\n", ret);
 								system("rm -rf /tmp/upgrade_extract");
 								return;
 							}
-							printf("Padding completed\n");
+							printf("Padding completed for p18\n");
 						}
 						
-						// 验证刷写结果
-						printf("Verifying flash operation...\n");
+						// 4. 刷入rootfs.bin到mmcblk0p20 (Rootfs B)
+						printf("\n=== Flashing rootfs to /dev/mmcblk0p20 (Rootfs B) ===\n");
+						snprintf(cmd, sizeof(cmd), "dd if=%s of=/dev/mmcblk0p20 bs=512 count=%d conv=sync 2>/dev/null", 
+								 rootfs_path, rootfs_blocks);
+						printf("Executing: %s\n", cmd);
+						ret = system(cmd);
+						if (ret != 0) {
+							printf("Error: Failed to flash rootfs to p20 (return code: %d)\n", ret);
+							system("rm -rf /tmp/upgrade_extract");
+							return;
+						}
+						printf("Rootfs flashed to /dev/mmcblk0p20 (%d blocks)\n", rootfs_blocks);
 						
-						// 检查kernel分区
-						printf("Kernel partition (/dev/mmcblk0p17):\n");
+						// 如果目标分区比写入的数据大，用零填充剩余空间
+						if (rootfs_blocks < target_partition_blocks) {
+							int fill_blocks = target_partition_blocks - rootfs_blocks;
+							printf("Filling remaining %d blocks with zeros in p20...\n", fill_blocks);
+							
+							snprintf(cmd, sizeof(cmd), 
+									 "dd if=/dev/zero of=/dev/mmcblk0p20 bs=512 seek=%d count=%d conv=notrunc,sync 2>/dev/null",
+									 rootfs_blocks, fill_blocks);
+							ret = system(cmd);
+							if (ret != 0) {
+								printf("Error: dd zero-fill command failed for p20 with return code %d\n", ret);
+								system("rm -rf /tmp/upgrade_extract");
+								return;
+							}
+							printf("Padding completed for p20\n");
+						}
+						
+						// ========== 验证刷写结果 ==========
+						
+						printf("\n=== Verifying flash operation ===\n");
+						
+						// 检查所有kernel分区
+						printf("Kernel partition /dev/mmcblk0p16:\n");
+						system("dd if=/dev/mmcblk0p16 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						printf("Kernel partition /dev/mmcblk0p17:\n");
 						system("dd if=/dev/mmcblk0p17 bs=512 count=1 2>/dev/null | head -c 4");
 						printf("\n");
 						
-						// 检查rootfs分区
-						printf("Rootfs partition (/dev/mmcblk0p18):\n");
+						// 检查所有rootfs分区
+						printf("Rootfs partition /dev/mmcblk0p18:\n");
 						system("dd if=/dev/mmcblk0p18 bs=512 count=1 2>/dev/null | head -c 4");
 						printf("\n");
 						
+						printf("Rootfs partition /dev/mmcblk0p20:\n");
+						system("dd if=/dev/mmcblk0p20 bs=512 count=1 2>/dev/null | head -c 4");
+						printf("\n");
+						
+						// 显示分区信息
+						printf("\nPartition layout after update:\n");
+						system("ls -la /dev/mmcblk0p*");
+						printf("\nBlock device information:\n");
+						system("fdisk -l /dev/mmcblk0 | grep mmcblk0p");
+						
 						// 同步文件系统
+						printf("Syncing filesystems...\n");
 						system("sync");
 						
 						// 清理临时文件
 						system("rm -rf /tmp/upgrade_extract");
 						
-						printf("EMMC upgrade completed successfully!\n");
-						printf("Kernel: %d blocks in /dev/mmcblk0p17\n", kernel_blocks);
-						printf("Rootfs: %d blocks in /dev/mmcblk0p18\n", rootfs_blocks);
+						printf("\n=== Complete A/B System Update Successful! ===\n");
+						printf("Kernel updates:\n");
+						printf("  /dev/mmcblk0p16 (Kernel A): %d blocks\n", kernel_blocks);
+						printf("  /dev/mmcblk0p17 (Kernel B): %d blocks\n", kernel_blocks);
+						printf("Rootfs updates:\n");
+						printf("  /dev/mmcblk0p18 (Rootfs A): %d blocks\n", rootfs_blocks);
+						printf("  /dev/mmcblk0p20 (Rootfs B): %d blocks\n", rootfs_blocks);
+						printf("\nBoth A and B systems are now updated and ready for use.\n");
 
 					}
 #else
