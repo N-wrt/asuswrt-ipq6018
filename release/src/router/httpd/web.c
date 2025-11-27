@@ -25375,7 +25375,7 @@ ej_memory_usage(int eid, webs_t wp, int argc, char_t **argv){
 	unsigned long total, used, mfree  /*, shared, buffers, cached, driver occupied*/;
 	char buf[80];
 	int from_app = 0, i = 0;
-	int memSize[] = {4,8,16,32,64,128,256,512,1024};
+	int memSize[] = {4,8,16,32,64,128,256,512,1024,2048,3072,4096,8192};
 	int length = sizeof(memSize)/4;
 	unsigned long  maxSize = 0, currentSize = 0;
 
