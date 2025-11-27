@@ -40,11 +40,11 @@
 #endif
 
 #ifndef RT_FWVER
-#define RT_FWVER	"5.2.4"
+#define RT_FWVER	"5.2.8"
 #endif
 
 #ifndef RT_FWEXTENDNO
-#define RT_FWEXTENDNO	"30078"
+#define RT_FWEXTENDNO	"32407"
 #endif
 
 #if defined(RTCONFIG_BCMARM)
@@ -818,7 +818,8 @@ void exec_uu_swrt()
 	if(sw_mode() == SW_MODE_ROUTER){
 		add_rc_support("uu_accel");
 		mkdir("/tmp/uu", 0755);
-		snprintf(buf, sizeof(buf), "wget -t 2 -T 30 --dns-timeout=120 --header=Accept:text/plain -q --no-check-certificate %s -O %s",
+		// --header=Accept:text/plain, add header: txt, otherwise: json
+		snprintf(buf, sizeof(buf), "wget -t 2 -T 30 --dns-timeout=120 -q --no-check-certificate %s -O %s",
 			"https://router.uu.163.com/api/script/monitor?type=asuswrt-merlin", "/tmp/uu/script_url");
 		if (!system(buf)){
 			_dprintf("download uuplugin script info successfully\n");
