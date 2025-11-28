@@ -17795,6 +17795,7 @@ _dprintf("%s %d turnning on power on ethernet here\n", __func__, __LINE__);
 
 			extern int start_misc_services(void);
 			start_misc_services();
+			doSystem("/usr/sbin/mount_mmc.sh &");
 #if defined(RTCONFIG_SWRT)
 			swrt_init_post();
 #endif
