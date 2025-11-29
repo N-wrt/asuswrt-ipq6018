@@ -13,6 +13,8 @@ ifeq ($(TCONFIG_USB),y)
 	ln -sf /opt/bin/perl $(INSTALLDIR)/usr/bin/perl
 endif
 
+	install -m 0755 mount_mmc.sh $(INSTALLDIR)/usr/sbin
+
 # cron helper
 	install -m 0700 cru $(INSTALLDIR)/usr/sbin
 
