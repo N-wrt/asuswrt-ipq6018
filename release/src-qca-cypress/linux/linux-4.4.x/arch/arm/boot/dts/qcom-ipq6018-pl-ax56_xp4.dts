@@ -41,7 +41,7 @@
 
 	chosen {
 		// 修改内核命令行参数，添加block2mtd配置
-		bootargs-override = "console=ttyMSM0,115200n8 root=/dev/mmcblk0p18 rootwait rootfstype=squashfs,ext4 swiotlb=1 coherent_pool=2M block2mtd.block2mtd=/dev/mmcblk0p25,131072,UBI_DEV ubi.mtd=UBI_DEV";
+		bootargs-override = "console=ttyMSM0,115200n8 root=/dev/mmcblk0p18 rootwait rootfstype=squashfs,ext4 swiotlb=1 coherent_pool=2M block2mtd.block2mtd=/dev/mmcblk0p22,131072,UBI_DEV ubi.mtd=UBI_DEV";
 	};
 
 };
