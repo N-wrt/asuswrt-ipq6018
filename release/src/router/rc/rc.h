@@ -1944,6 +1944,9 @@ static inline void stop_cifs(void) {};
 extern int start_ledg(void);
 extern int stop_ledg(void);
 #endif
+#ifdef RTCONFIG_QCA
+extern int start_inputbtn(void);
+#endif
 
 // linkmonitor.c
 extern int linkmonitor_main(int argc, char *argv[]);

@@ -9982,6 +9982,9 @@ start_services(void)
 	start_ledg();
 	start_ledbtn();
 #endif
+#ifdef RTCONFIG_QCA
+	start_inputbtn();
+#endif
 #ifdef RTCONFIG_SOFTCENTER
 	start_skipd();
 #endif
