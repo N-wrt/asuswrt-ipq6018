@@ -5932,12 +5932,13 @@ int init_nvram(void)
 #else				
 			set_basic_ifname_vars(wan_ifaces, "eth3 eth2", wl_ifaces, "usb", NULL, NULL, NULL, 0);
 #endif			
-		nvram_set_int("btn_rst_gpio", 34|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_wps_gpio", 9);
+		nvram_set_int("btn_rst_gpio", 34|GPIO_ACTIVE_LOW);	/* AIMesh button */
+		nvram_set_int("btn_wps_gpio", 9);	/* WPS button on GPIO9 */
 		nvram_set_int("led_blue_gpio", 69|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_green_gpio", 70|GPIO_ACTIVE_LOW);
 		nvram_set_int("led_red_gpio", 50|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_rst_gpio_1", 42);
+		nvram_set_int("btn_rst_gpio_1", 0xFF);	/* Reset button on GPIO42 */
+		nvram_set_int("btn_wps_gpio_1", 0xFF);
 
 		/* enable bled */
 		config_netdev_bled("led_blue_gpio", "ath1");
@@ -17848,8 +17849,10 @@ _dprintf("%s %d turnning on power on ethernet here\n", __func__, __LINE__);
 			}
 
 #if defined(RTCONFIG_FIXED_BRIGHTNESS_RGBLED) && !defined(MAPAC1750)
+#ifdef RGBLED_DEFAULT_STANDBY
 			if (nvram_match("x_Setting", "0"))
 				set_rgbled(RGBLED_DEFAULT_STANDBY);
+#endif
 #endif
 
 			break;
