@@ -146,7 +146,7 @@ EXSTRING:=-$(EXTENDTYPE)
 else
 EXSTRING:=
 endif
-export EXTENDNO := $(shell cat ./router/extendno.conf | sed 's/EXTENDNO=//g')
+export EXTENDNO := $(shell cat ./router/extendno.conf | sed 's/EXTENDNO=//g' | sed 's/-[0-9]*$$//')-$(shell date +%Y%m%d)
 endif
 
 export SWPJNAME := $(shell git branch | grep "*" | grep "swpj-" | sed 's/.*swpj-//g')

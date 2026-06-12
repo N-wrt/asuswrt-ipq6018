@@ -7722,6 +7722,12 @@ void stop_bluetooth_service(void)
 }
 #endif	/* RTCONFIG_BT_CONN */
 
+#ifndef RTCONFIG_BT_CONN
+void stop_bluetooth_service(void)
+{
+}
+#endif
+
 #ifdef RTCONFIG_WIFI_SON
 #if defined(RTCONFIG_ETHBACKHAUL) && defined(RTCONFIG_QCA_ORG_UPDOWN_SEPARATE)
 void start_ethbl_lldpd(void)
@@ -9976,14 +9982,14 @@ start_services(void)
 	start_ledg();
 	start_ledbtn();
 #endif
+#ifdef RTCONFIG_QCA
+	start_inputbtn();
+#endif
 #ifdef RTCONFIG_SOFTCENTER
 	start_skipd();
 #endif
 #ifdef RTCONFIG_ASD
 	start_asd();
-#endif
-#ifdef RTCONFIG_QCA
-	start_inputbtn();
 #endif
 #ifdef RTCONFIG_LANTIQ
 	start_wave_monitor();
