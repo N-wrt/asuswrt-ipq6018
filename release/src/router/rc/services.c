@@ -7722,6 +7722,12 @@ void stop_bluetooth_service(void)
 }
 #endif	/* RTCONFIG_BT_CONN */
 
+#ifndef RTCONFIG_BT_CONN
+void stop_bluetooth_service(void)
+{
+}
+#endif
+
 #ifdef RTCONFIG_WIFI_SON
 #if defined(RTCONFIG_ETHBACKHAUL) && defined(RTCONFIG_QCA_ORG_UPDOWN_SEPARATE)
 void start_ethbl_lldpd(void)
