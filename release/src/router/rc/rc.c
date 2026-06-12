@@ -1547,7 +1547,7 @@ static const applets_t applets[] = {
 #if defined(RTCONFIG_AMAS) && (defined(RTCONFIG_BCMWL6) || defined(RTCONFIG_LANTIQ) || defined(RTCONFIG_QCA) || defined(RTCONFIG_REALTEK) || defined(RTCONFIG_RALINK))
 	{ "obd",			obd_main			},
 #endif
-#if defined(RTCONFIG_AMAS) && defined(RTCONFIG_ETHOBD)
+#if defined(RTCONFIG_AMAS) && defined(ETHOBD) && (ETHOBD == y)
 	{ "obd_eth",		obdeth_main				},
 	{ "obd_monitor",	obd_monitor_main			},
 #endif
