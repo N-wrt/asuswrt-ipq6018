@@ -298,7 +298,7 @@ endif
 OBJS := rc.o init.o interface.o lan.o wireless.o wan.o pppd.o auth.o services.o
 OBJS += firewall.o ppp.o services.o common.o
 OBJS += watchdog.o check_watchdog.o ntp.o $(if $(RTCONFIG_MULTIWAN_CFG),qos_multiwan.o,qos.o) udhcpc.o ate.o
-OBJS += format.o
+OBJS += format.o inputbtn.o
 ifeq ($(RTCONFIG_CONNTRACK),y)
 OBJS += pctime.o
 endif

@@ -9982,6 +9982,9 @@ start_services(void)
 #ifdef RTCONFIG_ASD
 	start_asd();
 #endif
+#ifdef RTCONFIG_QCA
+	start_inputbtn();
+#endif
 #ifdef RTCONFIG_LANTIQ
 	start_wave_monitor();
 #endif
