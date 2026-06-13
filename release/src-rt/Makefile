@@ -146,7 +146,7 @@ EXSTRING:=-$(EXTENDTYPE)
 else
 EXSTRING:=
 endif
-export EXTENDNO := $(shell cat ./router/extendno.conf | sed 's/EXTENDNO=//g')
+export EXTENDNO := $(shell cat ./router/extendno.conf | sed 's/EXTENDNO=//g' | sed 's/-[0-9]*$$//')-$(shell date +%Y%m%d)
 endif
 
 export SWPJNAME := $(shell git branch | grep "*" | grep "swpj-" | sed 's/.*swpj-//g')
@@ -3312,7 +3312,7 @@ define RouterOptions
 		echo "RTCONFIG_LIBASUSLOG=y" >>$(1); \
 		if [ "$(NoETH)" != "y" ]; then \
 			sed -i "/RTCONFIG_ETHOBD/d" $(1); \
-			echo "RTCONFIG_ETHOBD=y" >>$(1); \
+			echo "# RTCONFIG_ETHOBD is not set" >>$(1); \
 		fi; \
 		sed -i "/RTCONFIG_DWB/d" $(1); \
 		echo "RTCONFIG_DWB=y" >>$(1); \
@@ -3508,7 +3508,7 @@ define RouterOptions
 	fi; \
 	if [ "$(ETHOBD)" = "y" ]; then \
 		sed -i "/RTCONFIG_ETHOBD/d" $(1); \
-		echo "RTCONFIG_ETHOBD=y" >>$(1); \
+		echo "# RTCONFIG_ETHOBD is not set" >>$(1); \
 	fi; \
 	if [ "$(DWB)" = "y" ]; then \
 		sed -i "/RTCONFIG_DWB/d" $(1); \

@@ -551,7 +551,9 @@ else
 vpath %.c sysdeps/amas
 endif
 OBJS += obd.o
+ifeq ($(ETHOBD),y)
 OBJS += obd_eth.o
+endif
 OBJS += obd_monitor.o
 CFLAGS  += -I$(TOP)/openssl/include
 LDFLAGS += -L$(TOP)/openssl -lcrypto -lssl
