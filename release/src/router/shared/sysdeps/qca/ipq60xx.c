@@ -413,7 +413,9 @@ int ipq60xx_vlan_set(int vtype, char *upstream_if, int vid, int prio, unsigned i
  * @speed:	pointer to unsigned integer.
  * 		If speed != NULL,
  * 			*speed = 1 means 100Mbps
- * 			*speed = 2 means 1000Mbps
+ * 			*speed = 2 means 1000Mbps (1Gbps)
+ * 			*speed = 3 means 10Gbps
+ * 			*speed = 4 means 2500Mbps (2.5Gbps)
  * @return:
  * 	0:	success
  *     -1:	invalid parameter
@@ -467,10 +469,14 @@ static int get_ipq60xx_port_info(unsigned int port, unsigned int *link, unsigned
 			return -7;
 
 		pt += 8; // strlen of "[speed]:"
-		if (!strncmp(pt, "1000", 4))
-			s = 2;
+		if (!strncmp(pt, "10000", 5))
+			s = 3;	// 10Gbps
+		else if (!strncmp(pt, "2500", 4))
+			s = 4;	// 2.5Gbps
+		else if (!strncmp(pt, "1000", 4))
+			s = 2;	// 1Gbps
 		else
-			s = 1;
+			s = 1;	// 100Mbps
 	}
 
 	if (link)
@@ -491,7 +497,9 @@ static int get_ipq60xx_port_info(unsigned int port, unsigned int *link, unsigned
  * @speed:	pointer to unsigned integer.
  * 		If speed != NULL,
  * 			*speed = 1 means 100Mbps
- * 			*speed = 2 means 1000Mbps
+ * 			*speed = 2 means 1000Mbps (1Gbps)
+ * 			*speed = 3 means 10Gbps
+ * 			*speed = 4 means 2500Mbps (2.5Gbps)
  * @return:
  * 	0:	success
  *     -1:	invalid parameter
@@ -689,7 +697,7 @@ static void get_ipq60xx_Port_Speed(unsigned int port_mask, unsigned int *speed)
 			continue;
 		get_ipq60xx_vport_info(i, NULL, (unsigned int*) &t);
 
-		t &= 0x3;
+		t &= 0x7;	/* speed: 1=100M, 2=1G, 3=10G, 4=2.5G */
 		if (t > v)
 			v = t;
 	}
@@ -703,6 +711,12 @@ static void get_ipq60xx_Port_Speed(unsigned int port_mask, unsigned int *speed)
 		break;
 	case 0x2:
 		*speed = 1000;
+		break;
+	case 0x3:
+		*speed = 10000;
+		break;
+	case 0x4:
+		*speed = 2500;
 		break;
 	default:
 		_dprintf("%s: invalid speed!\n", __func__);
@@ -1091,6 +1105,27 @@ rtkswitch_Reset_Storm_Control(void)
 	return 0;
 }
 
+/* Convert speed value to character for ATE output
+ * 0,10: 10Mbps    ==> 't'
+ * 1,100: 100Mbps  ==> 'M'
+ * 2,1000: 1Gbps   ==> 'G'
+ * 3,10000: 10Gbps ==> 'T'
+ * 4,2500: 2.5Gbps ==> 'Q'
+ * 5,5000: 5Gbps   ==> 'F'
+ */
+static char speed_to_char(unsigned int speed)
+{
+	switch (speed) {
+	case 3:	return 'T';	/* 10Gbps */
+	case 4:	return 'Q';	/* 2.5Gbps */
+	case 5:	return 'F';	/* 5Gbps */
+	case 2:	return 'G';	/* 1Gbps */
+	case 1:	return 'M';	/* 100Mbps */
+	case 0:	return 't';	/* 10Mbps */
+	default: return 'M';
+	}
+}
+
 void ATE_port_status(phy_info_list *list)
 {
 	int i, len;
@@ -1106,10 +1141,10 @@ void ATE_port_status(phy_info_list *list)
 
 	len = 0;
 	if (vport_to_phy_addr[WAN_PORT] >= 0)
-		len += sprintf(buf+len, "W0=%C;", (pS.link[WAN_PORT] == 1) ? (pS.speed[WAN_PORT] == 2) ? 'G' : 'M': 'X');
+		len += sprintf(buf+len, "W0=%C;", (pS.link[WAN_PORT] == 1) ? speed_to_char(pS.speed[WAN_PORT]) : 'X');
 	for (i = LAN1_PORT; i < WAN_PORT; i++) {
 		if (vport_to_phy_addr[i] >= 0)
-			len += sprintf(buf+len, "L%d=%C;", (i-LAN1_PORT)+1, (pS.link[i] == 1) ? (pS.speed[i] == 2) ? 'G' : 'M': 'X');
+			len += sprintf(buf+len, "L%d=%C;", (i-LAN1_PORT)+1, (pS.link[i] == 1) ? speed_to_char(pS.speed[i]) : 'X');
 		else
 			; // break;
 	}
